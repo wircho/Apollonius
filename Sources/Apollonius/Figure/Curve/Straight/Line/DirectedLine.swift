@@ -17,6 +17,7 @@ public final class DirectedLine<T, DirectionPhantom: DirectedLinePhantom, P: Poi
 }
 
 extension DirectedLine: Line {
+    public typealias Phantom = LinePhantom<T>
     public func update() {
         xy0 = point.object?.xy
         guard let xy0 = xy0, let straight = straight.object, let direction = DirectionPhantom.direction(to: straight) else {

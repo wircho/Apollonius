@@ -1,3 +1,7 @@
-public protocol Line: Straight where Phantom == LinePhantom {}
+public protocol Line: Straight where Phantom == LinePhantom<T> {}
 
-public enum LinePhantom: StraightPhantom {}
+public enum LinePhantom<T: FloatingPoint>: StraightPhantom {
+    public func containsNormalizedValue(_ value: T) -> Bool {
+        return true
+    }
+}

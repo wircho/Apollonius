@@ -1,12 +1,14 @@
 public protocol Metric: Value {}
 
-public struct Squared<M: Metric>: Metric {
-    public var value: M.T
-    public init(value: M.T) { self.value = value }
+public struct Multiplied<M0: Metric, M1: Metric>: Metric where M0.T == M1.T {
+    public var value: M0.T
+    public init(value: M0.T) { self.value = value }
 }
 
-public extension Squared {
-    func squareRoot() -> M? {
+public typealias Squared<M: Metric> = Multiplied<M, M>
+
+public extension Multiplied where M0 == M1 {
+    func squareRoot() -> M0? {
         let squareRoot = value.squareRoot()
         guard squareRoot.isFinite else { return nil }
         return .init(value: squareRoot)
@@ -35,23 +37,23 @@ public func *<M: Metric>(lhs: M.T, rhs: M) -> M {
     return .init(value: lhs * rhs.value)
 }
 
-public func *<M: Metric>(lhs: M, rhs: M) -> Squared<M> {
+public func *<M0: Metric, M1: Metric>(lhs: M0, rhs: M1) -> Multiplied<M0, M1> {
     return .init(value: lhs.value * rhs.value)
 }
 
-public func /<V: Metric>(lhs: V, rhs: V.T) -> V? {
+public func /<M: Metric>(lhs: M, rhs: M.T) -> M? {
     let ratio = lhs.value / rhs
     guard ratio.isFinite else { return nil }
     return .init(value: ratio)
 }
 
-public func /<V: Metric>(lhs: V, rhs: V) -> V.T? {
+public func /<M: Metric>(lhs: M, rhs: M) -> M.T? {
     let ratio = lhs.value / rhs.value
     guard ratio.isFinite else { return nil }
     return ratio
 }
 
-public func /<V: Metric>(lhs: Squared<V>, rhs: V) -> V? {
+public func /<M: Metric>(lhs: Squared<M>, rhs: M) -> M? {
     let ratio = lhs.value / rhs.value
     guard ratio.isFinite else { return nil }
     return .init(value: ratio)
