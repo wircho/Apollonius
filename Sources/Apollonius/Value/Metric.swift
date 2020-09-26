@@ -39,6 +39,12 @@ public func *<M: Metric>(lhs: M, rhs: M) -> Squared<M> {
     return .init(value: lhs.value * rhs.value)
 }
 
+public func /<V: Metric>(lhs: V, rhs: V.T) -> V? {
+    let ratio = lhs.value / rhs
+    guard ratio.isFinite else { return nil }
+    return .init(value: ratio)
+}
+
 public func /<V: Metric>(lhs: V, rhs: V) -> V.T? {
     let ratio = lhs.value / rhs.value
     guard ratio.isFinite else { return nil }

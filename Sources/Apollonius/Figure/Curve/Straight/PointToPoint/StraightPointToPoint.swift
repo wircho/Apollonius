@@ -2,7 +2,7 @@ public final class StraightPointToPoint<T, Phantom: StraightPhantom, P0: Point, 
     let point0: Weak<P0>
     let point1: Weak<P1>
     public var children: [AnyWeakFigure<T>] = []
-    public let knownPoints: [AnyWeakPoint<T>]
+    public var knownPoints: [AnyWeakPoint<T>]
     public private(set) var xy0: XY<T>? = nil
     public private(set) var xy1: XY<T>? = nil
     

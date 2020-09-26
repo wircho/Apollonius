@@ -2,9 +2,9 @@ public final class CircleCenterAndRadius<T, C: Point, A: Point> where C.T == T, 
     let center: Weak<C>
     let arm: Weak<A>
     public var children: [AnyWeakFigure<T>] = []
+    public var knownPoints: [AnyWeakPoint<T>]
     public private(set) var centerXY: XY<T>? = nil
     public private(set) var radius: Length<T>? = nil
-    public let knownPoints: [AnyWeakPoint<T>]
     
     public init(center: C, arm: A) {
         self.center = Weak(center)

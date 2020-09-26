@@ -1,3 +1,1 @@
-# Apollonius
-
-A description of this package.
+# Apollonius - A Swift Euclidean Geometry Package

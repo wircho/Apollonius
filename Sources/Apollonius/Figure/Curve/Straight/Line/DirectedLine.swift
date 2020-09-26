@@ -2,7 +2,7 @@ public final class DirectedLine<T, DirectionPhantom: DirectedLinePhantom, P: Poi
     let point: Weak<P>
     let straight: Weak<S>
     public var children: [AnyWeakFigure<T>] = []
-    public let knownPoints: [AnyWeakPoint<T>]
+    public var knownPoints: [AnyWeakPoint<T>]
     public private(set) var xy0: XY<T>? = nil
     public private(set) var xy1: XY<T>? = nil
     

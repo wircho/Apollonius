@@ -52,6 +52,15 @@ public func -<T>(lhs: XY<T>, rhs: DXY<T>) -> XY<T> {
     return .init(x: lhs.x - rhs.dx, y: lhs.y - rhs.dy)
 }
 
+public func *<T>(lhs: T, rhs: DXY<T>) -> DXY<T> {
+    return .init(dx: lhs * rhs.dx, dy: lhs * rhs.dy)
+}
+
+public func /<T>(lhs: DXY<T>, rhs: T) -> DXY<T>? {
+    guard let dx = lhs.dx / rhs, let dy = lhs.dy / rhs else { return nil }
+    return DXY<T>(dx: dx, dy: dy)
+}
+
 public extension DXY {
     func normSquared() -> Squared<Length<T>> {
         return dx.length.squared() + dy.length.squared()
