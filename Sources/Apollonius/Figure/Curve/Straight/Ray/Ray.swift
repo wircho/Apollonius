@@ -1,7 +1,7 @@
-public protocol Ray: Straight where Phantom == RayPhantom<T> {}
+public protocol Ray: Straight where Phantom == RayPhantom {}
 
-public enum RayPhantom<T: FloatingPoint>: StraightPhantom {
-    public func containsNormalizedValue(_ value: T) -> Bool {
+public enum RayPhantom: StraightPhantom {
+    public static func containsNormalizedValue<T: FloatingPoint>(_ value: T) -> Bool {
         return value >= 0
     }
 }

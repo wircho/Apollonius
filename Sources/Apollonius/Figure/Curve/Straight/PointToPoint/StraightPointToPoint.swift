@@ -1,4 +1,4 @@
-public final class StraightPointToPoint<T, Phantom: StraightPhantom, P0: Point, P1: Point> where Phantom.T == T, P0.T == T, P1.T == T {
+public final class StraightPointToPoint<T, Phantom: StraightPhantom, P0: Point, P1: Point> where P0.T == T, P1.T == T {
     let point0: Weak<P0>
     let point1: Weak<P1>
     public var children: [AnyWeakFigure<T>] = []
@@ -23,7 +23,7 @@ extension StraightPointToPoint: Straight {
     }
 }
 
-extension StraightPointToPoint: Line where Phantom == LinePhantom<T> {}
-extension StraightPointToPoint: Segment where Phantom == SegmentPhantom<T> {}
-extension StraightPointToPoint: Ray where Phantom == RayPhantom<T> {}
+extension StraightPointToPoint: Line where Phantom == LinePhantom {}
+extension StraightPointToPoint: Segment where Phantom == SegmentPhantom {}
+extension StraightPointToPoint: Ray where Phantom == RayPhantom {}
 

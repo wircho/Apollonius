@@ -1,5 +1,5 @@
 public protocol Straight: Curve {
-    associatedtype Phantom: StraightPhantom where Phantom.T == T
+    associatedtype Phantom: StraightPhantom
     var xy0: XY<T>? { get }
     var xy1: XY<T>? { get }
 }

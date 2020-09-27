@@ -1,4 +1,3 @@
 public protocol StraightPhantom {
-    associatedtype T: FloatingPoint
-    func containsNormalizedValue(_ value: T) -> Bool
+    static func containsNormalizedValue<T: FloatingPoint>(_ value: T) -> Bool
 }
