@@ -1,17 +1,17 @@
 public protocol Coordinate: Dimension {}
 
 public struct X<T: FloatingPoint>: Coordinate {
-    public var value: T
+    public let value: T
     public init(value: T) { self.value = value }
 }
 
 public struct Y<T: FloatingPoint>: Coordinate {
-    public var value: T
+    public let value: T
     public init(value: T) { self.value = value }
 }
 
 public struct Length<T: FloatingPoint>: Metric {
-    public var value: T
+    public let value: T
     public init(value: T) { self.value = value }
 }
 

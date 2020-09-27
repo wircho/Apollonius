@@ -1,7 +1,7 @@
 public protocol Metric: Value {}
 
 public struct Multiplied<M0: Metric, M1: Metric>: Metric where M0.T == M1.T {
-    public var value: M0.T
+    public let value: M0.T
     public init(value: M0.T) { self.value = value }
 }
 

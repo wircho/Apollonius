@@ -1,5 +1,5 @@
 public struct Difference<D: Dimension>: Metric {
-    public var value: D.T
+    public let value: D.T
     public init(value: D.T) { self.value = value }
 }
 

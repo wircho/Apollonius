@@ -16,7 +16,7 @@ public final class CircleCenterAndRadius<T, C: Point, A: Point> where C.T == T, 
     }
 }
 
-extension CircleCenterAndRadius: Circular {
+extension CircleCenterAndRadius: Circle {
     public func update() {
         centerXY = center.object?.xy
         guard let centerXY = centerXY, let armXY = arm.object?.xy else {
