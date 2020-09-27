@@ -1,33 +1,37 @@
+import Numerics
+
+infix operator •: MultiplicationPrecedence
+
 public protocol Coordinate: Dimension {}
 
-public struct X<T: FloatingPoint>: Coordinate {
+public struct X<T: Real>: Coordinate {
     public let value: T
     public init(value: T) { self.value = value }
 }
 
-public struct Y<T: FloatingPoint>: Coordinate {
+public struct Y<T: Real>: Coordinate {
     public let value: T
     public init(value: T) { self.value = value }
 }
 
-public struct Length<T: FloatingPoint>: Metric {
+public struct Length<T: Real>: Metric {
     public let value: T
     public init(value: T) { self.value = value }
 }
 
-public typealias DX<T: FloatingPoint> = X<T>.Difference
-public typealias DY<T: FloatingPoint> = Y<T>.Difference
+public typealias DX<T: Real> = X<T>.Difference
+public typealias DY<T: Real> = Y<T>.Difference
 
 public extension Difference where D: Coordinate {
     var length: Length<T> { return .init(value: value) }
 }
 
-public struct XY<T: FloatingPoint> {
+public struct XY<T: Real> {
     public var x: X<T>
     public var y: Y<T>
 }
 
-public struct DXY<T: FloatingPoint> {
+public struct DXY<T: Real> {
     public var dx: DX<T>
     public var dy: DY<T>
 }
@@ -61,6 +65,10 @@ public func /<T>(lhs: DXY<T>, rhs: T) -> DXY<T>? {
     return DXY<T>(dx: dx, dy: dy)
 }
 
+public func •<T>(lhs: DXY<T>, rhs: DXY<T>) -> Squared<Length<T>> {
+    return lhs.dx.length * rhs.dx.length + lhs.dy.length * rhs.dy.length
+}
+
 public extension DXY {
     func normSquared() -> Squared<Length<T>> {
         return dx.length.squared() + dy.length.squared()
@@ -72,5 +80,9 @@ public extension DXY {
     
     var rotated90Degrees: DXY {
         return .init(dx: .init(value: -dy.value), dy: .init(value: dx.value))
+    }
+    
+    var angle: Angle<T> {
+        return .init(value: T.atan2(y: dy.value, x: dx.value))
     }
 }

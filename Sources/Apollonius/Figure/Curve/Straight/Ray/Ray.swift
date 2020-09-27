@@ -1,7 +1,9 @@
+import Numerics
+
 public protocol Ray: Straight where Phantom == RayPhantom {}
 
 public enum RayPhantom: StraightPhantom {
-    public static func containsNormalizedValue<T: FloatingPoint>(_ value: T) -> Bool {
-        return value >= 0
+    public static func contains<T: Real>(normalizedValue: T) -> Bool {
+        return normalizedValue >= 0
     }
 }

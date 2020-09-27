@@ -34,8 +34,8 @@ extension StraightsIntersection: Point {
             xy = nil
             return
         }
-        guard S0.Phantom.containsNormalizedValue(value0),
-            S1.Phantom.containsNormalizedValue(value1) else {
+        guard S0.Phantom.contains(normalizedValue:value0),
+            S1.Phantom.contains(normalizedValue:value1) else {
             xy = nil
             return
         }

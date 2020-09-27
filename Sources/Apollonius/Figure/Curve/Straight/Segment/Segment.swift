@@ -1,7 +1,9 @@
+import Numerics
+
 public protocol Segment: Straight where Phantom == SegmentPhantom {}
 
 public enum SegmentPhantom: StraightPhantom {
-    public static func containsNormalizedValue<T: FloatingPoint>(_ value: T) -> Bool {
-        return value >= 0 && value <= 1
+    public static func contains<T: Real>(normalizedValue: T) -> Bool {
+        return normalizedValue >= 0 && normalizedValue <= 1
     }
 }

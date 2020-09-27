@@ -1,4 +1,6 @@
-public struct AnyWeakPoint<T: FloatingPoint>: AnyWeakFigureConvertible {
+import Numerics
+
+public struct AnyWeakPoint<T: Real>: AnyWeakFigureConvertible {
     let _xy: () -> XY<T>?
     
     public var xy: XY<T>? { return _xy() }

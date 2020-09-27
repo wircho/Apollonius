@@ -1,3 +1,5 @@
+import Numerics
+
 public protocol StraightPhantom {
-    static func containsNormalizedValue<T: FloatingPoint>(_ value: T) -> Bool
+    static func contains<T: Real>(normalizedValue: T) -> Bool
 }

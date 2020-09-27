@@ -1,5 +1,5 @@
 public enum StraightAndCircularIntersectionIndex {
-    case first, second
+    case positive, negative
 }
 
 public final class StraightAndCircularIntersection<T, S: Straight, C: Circular> where S.T == T, C.T == T {
@@ -23,6 +23,38 @@ public final class StraightAndCircularIntersection<T, S: Straight, C: Circular> 
 
 extension StraightAndCircularIntersection: Point {
     public func update() {
-        #warning("Implement")
+        guard let vector = straight.object?.vector,
+            let origin = straight.object?.xy0,
+            let circular = circular.object,
+            let center = circular.centerXY,
+            let radius = circular.radius else {
+            xy = nil
+            return
+        }
+        let centerToOrigin = origin - center
+        let a = vector.normSquared()
+        let b = 2 * (vector • centerToOrigin)
+        let c = centerToOrigin.normSquared() - radius.squared()
+        let discriminant = b.squared() - 4 * (a * c)
+        guard let discriminantSquareRoot = discriminant.squareRoot() else {
+            xy = nil
+            return
+        }
+        let numerator: Squared<Length<T>>
+        switch index {
+        case .positive: numerator = -b + discriminantSquareRoot
+        case .negative: numerator = -b - discriminantSquareRoot
+        }
+        guard let t = numerator / (2 * a), S.Phantom.contains(normalizedValue: t) else {
+            xy = nil
+            return
+        }
+        let possibleXY = origin + t * vector
+        let angle = (possibleXY - center).angle
+        guard circular.contains(angle: angle) else {
+            xy = nil
+            return
+        }
+        xy = possibleXY
     }
 }

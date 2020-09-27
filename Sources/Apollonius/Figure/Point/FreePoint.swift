@@ -1,4 +1,6 @@
-public final class FreePoint<T: FloatingPoint> {
+import Numerics
+
+public final class FreePoint<T: Real> {
     public var children: [AnyWeakFigure<T>] = []
     public private(set) var xy: XY<T>?
     

@@ -58,4 +58,3 @@ public func /<M: Metric>(lhs: Squared<M>, rhs: M) -> M? {
     guard ratio.isFinite else { return nil }
     return .init(value: ratio)
 }
-

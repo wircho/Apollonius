@@ -1,5 +1,6 @@
 import XCTest
 @testable import Apollonius
+import Numerics
 
 final class ApolloniusTests: XCTestCase {
     func testExample() {
@@ -39,7 +40,7 @@ typealias SegmentTest<F: Segment & Straight & Curve & Figure> = F
 typealias LineTest<F: Line & Straight & Curve & Figure> = F
 typealias RayTest<F: Ray & Straight & Curve & Figure> = F
 
-typealias FreePointTest<T: FloatingPoint> = PointTest<FreePoint<T>>
-typealias SegmentPointToPointTest<T: FloatingPoint> = SegmentTest<SegmentPointToPoint<T, FreePoint<T>, FreePoint<T>>>
-typealias LinePointToPointTest<T: FloatingPoint> = LineTest<LinePointToPoint<T, FreePoint<T>, FreePoint<T>>>
-typealias RayPointToPointTest<T: FloatingPoint> = RayTest<RayPointToPoint<T, FreePoint<T>, FreePoint<T>>>
+typealias FreePointTest<T: Real> = PointTest<FreePoint<T>>
+typealias SegmentPointToPointTest<T: Real> = SegmentTest<SegmentPointToPoint<T, FreePoint<T>, FreePoint<T>>>
+typealias LinePointToPointTest<T: Real> = LineTest<LinePointToPoint<T, FreePoint<T>, FreePoint<T>>>
+typealias RayPointToPointTest<T: Real> = RayTest<RayPointToPoint<T, FreePoint<T>, FreePoint<T>>>

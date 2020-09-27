@@ -1,4 +1,6 @@
-public struct Angle<T: FloatingPoint>: Value {
+import Numerics
+
+public struct Angle<T: Real>: Value {
     public let value: T
     public init(value: T) { self.value = value }
 }

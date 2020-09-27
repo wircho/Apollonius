@@ -1,9 +1,11 @@
+import Numerics
+
 public protocol AnyWeakFigureConvertible {
-    associatedtype T: FloatingPoint
+    associatedtype T: Real
     var asWeakFigure: AnyWeakFigure<T> { get }
 }
 
-public struct AnyWeakFigure<T: FloatingPoint> {
+public struct AnyWeakFigure<T: Real> {
     let _children: () -> [AnyWeakFigure<T>]?
     let _update: () -> Void
     weak var object: AnyObject?

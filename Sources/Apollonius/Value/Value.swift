@@ -1,5 +1,7 @@
+import Numerics
+
 public protocol Value: Comparable {
-    associatedtype T: FloatingPoint
+    associatedtype T: Real
     var value: T { get }
     init(value: T)
 }

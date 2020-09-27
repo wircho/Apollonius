@@ -1,4 +1,6 @@
-public struct AngleInterval<T: FloatingPoint> {
+import Numerics
+
+public struct AngleInterval<T: Real> {
     public let angle0: Angle<T>
     public let angle1: Angle<T>
     
