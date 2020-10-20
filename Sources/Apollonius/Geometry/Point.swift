@@ -112,7 +112,21 @@ extension Geometry.Point: Figure {
     case let ._otherIntersection(intersection, index):
       return intersection.inner.object[index]
     case let ._twoStraightsIntersection(straight0, straight1):
-      return nil
+      guard let straightValue0 = straight0.inner.object.value, let straightValue1 = straight1.inner.object.value else { return nil }
+      let origin0 = straightValue0.origin
+      let origin1 = straightValue1.origin
+      let vector0 = straightValue0.vector
+      let vector1 = straightValue1.vector
+      let originDifference = origin1 - origin0
+      let numerator0 = originDifference.dx * vector1.dy - vector1.dx * originDifference.dy
+      let numerator1 = vector0.dx * originDifference.dy - originDifference.dx * vector0.dy
+      let denominator = vector0.dx * vector1.dy - vector1.dx * vector0.dy
+      guard let value0 = numerator0 / denominator, let value1 = numerator1 / denominator else { return nil }
+      guard straight0.inner.object.contains(normalizedValue: value0) == true
+        && straight1.inner.object.contains(normalizedValue: value1) == true else {
+          return nil
+      }
+      return origin0 + value0 * vector0
     }
   }
 }
