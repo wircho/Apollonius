@@ -41,6 +41,6 @@ typealias LineTest<F: Line & Straight & Curve & Figure> = F
 typealias RayTest<F: Ray & Straight & Curve & Figure> = F
 
 typealias FreePointTest<T: Real> = PointTest<FreePoint<T>>
-typealias SegmentPointToPointTest<T: Real> = SegmentTest<SegmentPointToPoint<T, FreePoint<T>, FreePoint<T>>>
-typealias LinePointToPointTest<T: Real> = LineTest<LinePointToPoint<T, FreePoint<T>, FreePoint<T>>>
-typealias RayPointToPointTest<T: Real> = RayTest<RayPointToPoint<T, FreePoint<T>, FreePoint<T>>>
+typealias SegmentPointToPointTest<T: Real> = SegmentTest<SegmentPointToPoint<T>>
+typealias LinePointToPointTest<T: Real> = LineTest<LinePointToPoint<T>>
+typealias RayPointToPointTest<T: Real> = RayTest<RayPointToPoint<T>>
