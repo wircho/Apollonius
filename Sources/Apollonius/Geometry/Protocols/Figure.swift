@@ -15,10 +15,6 @@ public extension Figure {
   func update() { value = newValue() }
 }
 
-// UnownedFigure
-
-import Numerics
-
 public protocol UnownedFigureConvertible {
   associatedtype T: Real
   var asUnownedFigure: UnownedFigure<T> { get }

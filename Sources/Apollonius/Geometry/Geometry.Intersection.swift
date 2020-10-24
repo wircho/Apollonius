@@ -2,8 +2,16 @@ import Numerics
 
 public extension Geometry {
   enum IntersectionParameters<T: Real> {
-    case straightCircular(UnownedStraight<T>, UnownedCircular<T>)
-    case twoCirculars(UnownedCircular<T>, UnownedCircular<T>)
+    case _straightCircular(UnownedStraight<T>, UnownedCircular<T>)
+    case _twoCirculars(UnownedCircular<T>, UnownedCircular<T>)
+    
+    public static func between(_ straight: Straight<T>, _ circular: Circular<T>) -> IntersectionParameters<T> {
+      return ._straightCircular(.init(straight), .init(circular))
+    }
+    
+    public static func between(_ circular0: Circular<T>, _ circular1: Circular<T>) -> IntersectionParameters<T> {
+      return ._twoCirculars(.init(circular0), .init(circular1))
+    }
   }
   
   final class Intersection<T: Real> {
@@ -19,11 +27,11 @@ public extension Geometry {
     public init(_ parameters: IntersectionParameters<T>) {
       self.parameters = parameters
       switch parameters {
-      case let .straightCircular(straight, circular):
+      case let ._straightCircular(straight, circular):
         // Parenting
         straight.inner.object.children.append(UnownedFigure(self))
         circular.inner.object.children.append(UnownedFigure(self))
-      case let .twoCirculars(circular0, circular1):
+      case let ._twoCirculars(circular0, circular1):
         // Parenting
         circular0.inner.object.children.append(UnownedFigure(self))
         circular1.inner.object.children.append(UnownedFigure(self))
@@ -95,8 +103,8 @@ extension Geometry.Intersection: Figure {
   
   public func newValue() -> Value? {
     switch parameters {
-    case let .straightCircular(straight, circular): return intersections(between: straight.inner.object, and: circular.inner.object)
-    case let .twoCirculars(circular0, circular1): return intersections(between: circular0.inner.object, and: circular1.inner.object)
+    case let ._straightCircular(straight, circular): return intersections(between: straight.inner.object, and: circular.inner.object)
+    case let ._twoCirculars(circular0, circular1): return intersections(between: circular0.inner.object, and: circular1.inner.object)
     }
   }
 }
@@ -119,6 +127,16 @@ public extension Geometry.Intersection.Value {
 public extension Geometry.Intersection {
   subscript(_ index: Geometry.IntersectionIndex) -> XY<T>? {
     return value?[index]
+  }
+}
+
+public extension Geometry.Intersection {
+  static func between(_ straight: Geometry.Straight<T>, _ circular: Geometry.Circular<T>) -> Geometry.Intersection<T> {
+    return .init(.between(straight, circular))
+  }
+  
+  static func between(_ circular0: Geometry.Circular<T>, _ circular1: Geometry.Circular<T>) -> Geometry.Intersection<T> {
+    return .init(.between(circular0, circular1))
   }
 }
 

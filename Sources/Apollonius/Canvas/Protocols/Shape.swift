@@ -4,3 +4,4 @@ public protocol Shape {
     var figure: F { get }
     var style: S { get set }
 }
+
