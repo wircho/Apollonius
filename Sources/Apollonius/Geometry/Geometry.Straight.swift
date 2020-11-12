@@ -13,11 +13,19 @@ public extension Geometry {
     case _between(origin: UnownedPoint<T>, tip: UnownedPoint<T>)
     case _directed(direction: StraightDirection, origin: UnownedPoint<T>, other: UnownedStraight<T>)
     
-    public static func between(origin: Point<T>, tip: Point<T>) -> StraightDefinition {
+    public static func between(_ origin: Point<T>, _ tip: Point<T>) -> StraightDefinition {
       return ._between(origin: .init(origin), tip: .init(tip))
     }
     
-    public static func directed(direction: StraightDirection, origin: Point<T>, other: Straight<T>) -> StraightDefinition {
+    public static func parallel(origin: Point<T>, other: Straight<T>) -> StraightDefinition {
+      return ._directed(direction: .parallel, origin: .init(origin), other: .init(other))
+    }
+    
+    public static func perpendicular(origin: Point<T>, other: Straight<T>) -> StraightDefinition {
+      return ._directed(direction: .perpendicular, origin: .init(origin), other: .init(other))
+    }
+    
+    public static func directed(_ direction: StraightDirection, origin: Point<T>, other: Straight<T>) -> StraightDefinition {
       return ._directed(direction: direction, origin: .init(origin), other: .init(other))
     }
   }
@@ -30,6 +38,34 @@ public extension Geometry {
       self.kind = kind
       self.definition = definition
     }
+    
+    public static func straight(_ kind: StraightKind, _ origin: Point<T>, _ tip: Point<T>) -> StraightParameters<T> {
+      return .init(kind, .between(origin, tip))
+    }
+    
+    public static func segment(_ origin: Point<T>, _ tip: Point<T>) -> StraightParameters<T> {
+      return .straight(.segment, origin, tip)
+    }
+    
+    public static func line(_ origin: Point<T>, _ tip: Point<T>) -> StraightParameters<T> {
+      return .straight(.line, origin, tip)
+    }
+    
+    public static func ray(_ origin: Point<T>, _ tip: Point<T>) -> StraightParameters<T> {
+      return .straight(.ray, origin, tip)
+    }
+    
+    public static func parallel(origin: Point<T>, other: Straight<T>) -> StraightParameters<T> {
+      return .init(.line, .parallel(origin: origin, other: other))
+    }
+    
+    public static func perpendicular(origin: Point<T>, other: Straight<T>) -> StraightParameters<T> {
+      return .init(.line, .perpendicular(origin: origin, other: other))
+    }
+    
+    public static func directed(_ direction: StraightDirection, origin: Point<T>, other: Straight<T>) -> StraightParameters<T> {
+      return .init(.line, .directed(direction, origin: origin, other: other))
+    }
   }
   
   final class Straight<T: Real> {
@@ -38,9 +74,10 @@ public extension Geometry {
       public let tip: XY<T>
     }
     
+    public let index = GlobalCounter.index
     public var value: Value? = nil
     public let parameters: StraightParameters<T>
-    public var children: [UnownedFigure<T>] = []
+    public var children: [UnownedShape<T>] = []
     public var knownPoints: [UnownedPoint<T>] = []
     
     public init(_ parameters: StraightParameters<T>) {
@@ -151,11 +188,41 @@ public extension Geometry.Straight {
   }
 }
 
-public struct UnownedStraight<T: Real>: UnownedFigureConvertibleInternal {
+extension Geometry.Straight {
+  public static func straight(_ kind: Geometry.StraightKind, _ origin: Geometry.Point<T>, _ tip: Geometry.Point<T>) -> Geometry.Straight<T> {
+    return .init(.straight(kind, origin, tip))
+  }
+  
+  public static func segment(_ origin: Geometry.Point<T>, _ tip: Geometry.Point<T>) -> Geometry.Straight<T> {
+    return .init(.segment(origin, tip))
+  }
+  
+  public static func line(_ origin: Geometry.Point<T>, _ tip: Geometry.Point<T>) -> Geometry.Straight<T> {
+    return .init(.line(origin, tip))
+  }
+  
+  public static func ray(_ origin: Geometry.Point<T>, _ tip: Geometry.Point<T>) -> Geometry.Straight<T> {
+    return .init(.ray(origin, tip))
+  }
+  
+  public static func parallel(origin: Geometry.Point<T>, other: Geometry.Straight<T>) -> Geometry.Straight<T> {
+    return .init(.parallel(origin: origin, other: other))
+  }
+  
+  public static func perpendicular(origin: Geometry.Point<T>, other: Geometry.Straight<T>) -> Geometry.Straight<T> {
+    return .init(.perpendicular(origin: origin, other: other))
+  }
+  
+  public static func directed(_ direction: Geometry.StraightDirection, origin: Geometry.Point<T>, other: Geometry.Straight<T>) -> Geometry.Straight<T> {
+    return .init(.directed(direction, origin: origin, other: other))
+  }
+}
+
+public struct UnownedStraight<T: Real>: UnownedShapeConvertibleInternal {
   let inner: Unowned<Geometry.Straight<T>>
   public let asUnownedCurve: UnownedCurve<T>
   // Computed
-  public var asUnownedFigure: UnownedFigure<T> { return asUnownedCurve.asUnownedFigure }
+  public var asUnownedShape: UnownedShape<T> { return asUnownedCurve.asUnownedShape }
   
   init(_ straight: Geometry.Straight<T>) {
     inner = .init(straight)

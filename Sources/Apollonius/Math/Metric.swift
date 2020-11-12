@@ -1,3 +1,5 @@
+import Numerics
+
 public protocol Metric: Value {}
 
 public struct Multiplied<M0: Metric, M1: Metric>: Metric where M0.T == M1.T {
@@ -20,9 +22,13 @@ public extension Multiplied where M0 == M1 {
 }
 
 public extension Metric {
-    func squared() -> Squared<Self> {
-        return .init(value: value.squared())
-    }
+  func squared() -> Squared<Self> {
+      return .init(value: value.squared())
+  }
+  
+  func abs() -> Self {
+    return .init(value: value.magnitude)
+  }
 }
 
 public func +<M: Metric>(lhs: M, rhs: M) -> M {

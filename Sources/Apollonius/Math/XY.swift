@@ -1,6 +1,7 @@
 import Numerics
 
 infix operator •: MultiplicationPrecedence
+infix operator ><: MultiplicationPrecedence
 
 public protocol Coordinate: Dimension {}
 
@@ -72,6 +73,10 @@ public func /<T>(lhs: DXY<T>, rhs: T) -> DXY<T>? {
 
 public func •<T>(lhs: DXY<T>, rhs: DXY<T>) -> Squared<Length<T>> {
     return lhs.dx.length * rhs.dx.length + lhs.dy.length * rhs.dy.length
+}
+
+public func ><<T>(lhs: DXY<T>, rhs: DXY<T>) -> Squared<Length<T>> {
+  return lhs.dx.length * rhs.dy.length - lhs.dy.length * rhs.dx.length
 }
 
 public extension Length {

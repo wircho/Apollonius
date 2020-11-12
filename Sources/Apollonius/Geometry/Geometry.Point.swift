@@ -2,6 +2,7 @@ import Numerics
 
 public extension Geometry {
   enum PointParameters<T: Real> {
+    case fixed(position: XY<T>)
     case free(cursor: Cursor<XY<T>>)
     case _onStraightAbsolute(UnownedStraight<T>, cursor: Cursor<Length<T>>)
     case _onStraightNormalized(UnownedStraight<T>, cursor: Cursor<T>)
@@ -9,6 +10,7 @@ public extension Geometry {
     case _twoStraightsIntersection(UnownedStraight<T>, UnownedStraight<T>)
     case _intersection(UnownedIntersection<T>, index: IntersectionIndex)
     case _oppositeIntersection(UnownedIntersection<T>, oppositePoint: UnownedPoint<T>)
+    case _circumcenter(UnownedPoint<T>, UnownedPoint<T>, UnownedPoint<T>)
     
     public static func on(_ straight: Straight<T>, cursor: Cursor<T>) -> PointParameters<T> {
       return ._onStraightNormalized(.init(straight), cursor: cursor)
@@ -33,18 +35,23 @@ public extension Geometry {
     public static func oppositeIntersection(_ intersection: Intersection<T>, from oppositePoint: Point<T>) -> PointParameters<T> {
       return ._oppositeIntersection(.init(intersection), oppositePoint: .init(oppositePoint))
     }
+    
+    public static func circumcenter(_ point0: Point<T>, _ point1: Point<T>, _ point2: Point<T>) -> PointParameters<T> {
+      return ._circumcenter(.init(point0), .init(point1), .init(point2))
+    }
   }
   
   final class Point<T: Real> {
+    public let index = GlobalCounter.index
     public var value: XY<T>? = nil
     public let parameters: PointParameters<T>
-    public var children: [UnownedFigure<T>] = []
+    public var children: [UnownedShape<T>] = []
     public var knwonCurves: [UnownedCurve<T>] = []
     
     public init(_ parameters: PointParameters<T>) {
       self.parameters = parameters
       switch parameters {
-      case .free: break
+      case .fixed, .free: break
       case let ._onStraightAbsolute(straight, _):
         // Parenting
         straight.inner.object.children.append(.init(self))
@@ -115,14 +122,23 @@ public extension Geometry {
           self.knwonCurves.append(circular0.asUnownedCurve)
           self.knwonCurves.append(circular1.asUnownedCurve)
         }
+      case let ._circumcenter(point0, point1, point2):
+        // Parenting
+        point0.inner.object.children.append(.init(self))
+        point1.inner.object.children.append(.init(self))
+        point2.inner.object.children.append(.init(self))
       }
     }
   }
 }
 
-extension Geometry.Point: Figure {
+func _circumcenter<T: Real>(_ xy0: XY<T>, _ xy1: XY<T>, _ xy2: XY<T>) -> XY<T>? { return circumcenter(xy0, xy1, xy2) }
+
+extension Geometry.Point: Shape {
   public func newValue() -> XY<T>? {
     switch parameters {
+    case let .fixed(position):
+      return position
     case let .free(cursor):
       return cursor.value
     case let ._onStraightAbsolute(straight, cursor):
@@ -137,11 +153,8 @@ extension Geometry.Point: Figure {
     case let ._intersection(intersection, index):
       return intersection.inner.object[index]
     case let ._oppositeIntersection(intersection, oppositePoint):
-      guard let oppositeXY = oppositePoint.inner.object.value else { return nil }
       guard let value = intersection.inner.object.value else { return nil }
-      guard let first = value.first, let second = value.second else { return nil }
-      let midpoint = first + ((second - first) / 2)!
-      return oppositeXY + 2 * (midpoint - oppositeXY)
+      return value.opposite(to: oppositePoint.inner.object.value)
     case let ._twoStraightsIntersection(straight0, straight1):
       guard let straightValue0 = straight0.inner.object.value, let straightValue1 = straight1.inner.object.value else { return nil }
       let origin0 = straightValue0.origin
@@ -158,11 +171,18 @@ extension Geometry.Point: Figure {
           return nil
       }
       return origin0 + value0 * vector0
+    case let ._circumcenter(point0, point1, point2):
+      guard let xy0 = point0.inner.object.value,  let xy1 = point1.inner.object.value,  let xy2 = point2.inner.object.value else { return nil }
+      return _circumcenter(xy0, xy1, xy2)
     }
   }
 }
 
 public extension Geometry.Point {
+  static func fixed(position: XY<T>) -> Geometry.Point<T> {
+    return .init(.fixed(position: position))
+  }
+  
   static func free(cursor: Geometry.Cursor<XY<T>>) -> Geometry.Point<T> {
     return .init(.free(cursor: cursor))
   }
@@ -191,40 +211,17 @@ public extension Geometry.Point {
     return .init(.intersection(straight0, straight1))
   }
   
-// // These are too unsafe - recreate an intersection element that might already exist.
-// // ---------------------------------------------------------------------------------
-//  static func intersection(_ straight: Geometry.Straight<T>, _ circular: Geometry.Circular<T>, index: Geometry.IntersectionIndex) -> (Geometry.Intersection<T>, Geometry.Point<T>) {
-//    let intersection = Geometry.Intersection.between(straight, circular)
-//    let point = Geometry.Point.intersection(intersection, index: index)
-//    return (intersection, point)
-//  }
-//
-//  static func intersection(_ circular0: Geometry.Circular<T>, _ circular1: Geometry.Circular<T>, index: Geometry.IntersectionIndex) -> (Geometry.Intersection<T>, Geometry.Point<T>) {
-//    let intersection = Geometry.Intersection.between(circular0, circular1)
-//    let point = Geometry.Point.intersection(intersection, index: index)
-//    return (intersection, point)
-//  }
-//
-//  static func oppositeIntersection(_ straight: Geometry.Straight<T>, _ circular: Geometry.Circular<T>, from oppositePoint: Geometry.Point<T>) -> (Geometry.Intersection<T>, Geometry.Point<T>) {
-//    let intersection = Geometry.Intersection.between(straight, circular)
-//    let point = Geometry.Point.oppositeIntersection(intersection, from: oppositePoint)
-//    return (intersection, point)
-//  }
-//
-//  static func oppositeIntersection(_ circular0: Geometry.Circular<T>, _ circular1: Geometry.Circular<T>, from oppositePoint: Geometry.Point<T>) -> (Geometry.Intersection<T>, Geometry.Point<T>) {
-//    let intersection = Geometry.Intersection.between(circular0, circular1)
-//    let point = Geometry.Point.oppositeIntersection(intersection, from: oppositePoint)
-//    return (intersection, point)
-//  }
-// // ---------------------------------------------------------------------------------
+  static func circumcenter(_ point0: Geometry.Point<T>, _ point1: Geometry.Point<T>, _ point2: Geometry.Point<T>) -> Geometry.Point<T> {
+    return .init(.circumcenter(point0, point1, point2))
+  }
 }
 
-public struct UnownedPoint<T: Real>: UnownedFigureConvertibleInternal {
+public struct UnownedPoint<T: Real>: UnownedShapeConvertibleInternal {
   let inner: Unowned<Geometry.Point<T>>
-  public let asUnownedFigure: UnownedFigure<T>
+  public let asUnownedShape: UnownedShape<T>
   
   init(_ point: Geometry.Point<T>) {
     inner = .init(point)
-    asUnownedFigure = .init(point)
+    asUnownedShape = .init(point)
   }
 }

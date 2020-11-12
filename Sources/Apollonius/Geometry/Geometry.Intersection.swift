@@ -20,27 +20,28 @@ public extension Geometry {
       public let second: XY<T>?
     }
     
+    public let index = GlobalCounter.index
     public var value: Value? = nil
     public let parameters: IntersectionParameters<T>
-    public var children: [UnownedFigure<T>] = []
+    public var children: [UnownedShape<T>] = []
     
     public init(_ parameters: IntersectionParameters<T>) {
       self.parameters = parameters
       switch parameters {
       case let ._straightCircular(straight, circular):
         // Parenting
-        straight.inner.object.children.append(UnownedFigure(self))
-        circular.inner.object.children.append(UnownedFigure(self))
+        straight.inner.object.children.append(UnownedShape(self))
+        circular.inner.object.children.append(UnownedShape(self))
       case let ._twoCirculars(circular0, circular1):
         // Parenting
-        circular0.inner.object.children.append(UnownedFigure(self))
-        circular1.inner.object.children.append(UnownedFigure(self))
+        circular0.inner.object.children.append(UnownedShape(self))
+        circular1.inner.object.children.append(UnownedShape(self))
       }
     }
   }
 }
 
-extension Geometry.Intersection: Figure {
+extension Geometry.Intersection: Shape {
   private func intersections(between straight: Geometry.Straight<T>, and circular: Geometry.Circular<T>) -> Value? {
     guard let straightValue = straight.value, let circularValue = circular.value else { return nil }
     let vector = straightValue.vector
@@ -122,6 +123,16 @@ public extension Geometry.Intersection.Value {
     case .second: return second
     }
   }
+  
+  var midpoint: XY<T>? {
+    guard let first = first, let second = second else { return nil }
+    return first + ((second - first) / 2)!
+  }
+  
+  func opposite(to xy: XY<T>?) -> XY<T>? {
+    guard let xy = xy, let midpoint = midpoint else { return nil }
+    return midpoint + (midpoint - xy)
+  }
 }
 
 public extension Geometry.Intersection {
@@ -140,12 +151,12 @@ public extension Geometry.Intersection {
   }
 }
 
-public struct UnownedIntersection<T: Real>: UnownedFigureConvertibleInternal {
+public struct UnownedIntersection<T: Real>: UnownedShapeConvertibleInternal {
   let inner: Unowned<Geometry.Intersection<T>>
-  public let asUnownedFigure: UnownedFigure<T>
+  public let asUnownedShape: UnownedShape<T>
   
   init(_ intersection: Geometry.Intersection<T>) {
     inner = .init(intersection)
-    asUnownedFigure = .init(intersection)
+    asUnownedShape = .init(intersection)
   }
 }
