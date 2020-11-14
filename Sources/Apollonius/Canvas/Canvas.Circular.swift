@@ -15,7 +15,7 @@ public extension Canvas {
     // Creating shape
     let shape = Geometry.Circular.centered(at: center.shape, through: tip.shape)
     let circular = Circular(shape, style: style, info: info)
-    items.unsafelyAppend(key: shape.key, value: .circular(circular))
+    add(circular)
     return circular
   }
   
@@ -29,7 +29,7 @@ public extension Canvas {
     // Creating shape
     let shape = Geometry.Circular.centered(at: center.shape, radius: radius.shape)
     let circular = Circular(shape, style: style, info: info)
-    items.unsafelyAppend(key: shape.key, value: .circular(circular))
+    add(circular)
     return circular
   }
   
@@ -42,7 +42,7 @@ public extension Canvas {
     // Creating shape
     let shape = Geometry.Circular.circumscribing(point0.shape, point1.shape, point2.shape)
     let circular = Circular(shape, style: style, info: info)
-    items.unsafelyAppend(key: shape.key, value: .circular(circular))
+    add(circular)
     return circular
   }
   
@@ -56,7 +56,7 @@ public extension Canvas {
     // Creating shape
     let shape = Geometry.Circular.arcCircumscribing(point0.shape, point1.shape, point2.shape)
     let circular = Circular(shape, style: style, info: info)
-    items.unsafelyAppend(key: shape.key, value: .circular(circular))
+    add(circular)
     return circular
   }
 }

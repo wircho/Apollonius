@@ -1,4 +1,18 @@
 extension Canvas {
+  func childrenKeys(_ item: Item) -> Set<ObjectIdentifier> {
+    switch item {
+    case let .circular(figure): return childrenKeys(figure)
+    case let .scalar(figure): return childrenKeys(figure)
+    case let .point(figure): return childrenKeys(figure)
+    case let .intersection(figure): return childrenKeys(figure)
+    case let .straight(figure): return childrenKeys(figure)
+    }
+  }
+  
+  func childrenKeys(_ key: ObjectIdentifier) -> Set<ObjectIdentifier> {
+    return childrenKeys(items[key]!)
+  }
+  
   func childrenKeys<Figure: FigureProtocol>(_ figure: Figure) -> Set<ObjectIdentifier> {
     return Set(figure.shape.children.map{ $0.key })
   }
@@ -85,3 +99,41 @@ extension Canvas {
     return commonKnownCurvesKeys(points).map{ items[$0]! }
   }
 }
+
+extension Canvas {
+  func gatherKeys(from key: ObjectIdentifier, includeUpstreamIntersections: Bool) -> Set<ObjectIdentifier> {
+    var gatheredKeys = Set<ObjectIdentifier>()
+    gatherKeys(from: key, gatheredKeys: &gatheredKeys, includeUpstreamIntersections: includeUpstreamIntersections)
+    return gatheredKeys
+  }
+  
+  func gatherKeys(from key: ObjectIdentifier, gatheredKeys: inout Set<ObjectIdentifier>, includeUpstreamIntersections: Bool) {
+    // Gathering the key itself
+    gatheredKeys.insert(key)
+    // Gathering intersection if this item is its only non-gathered child
+    if includeUpstreamIntersections { gatherKeysFromUpstreamIntersection(using: key, gatheredKeys: &gatheredKeys, includeUpstreamIntersections: includeUpstreamIntersections) }
+    // Gathering child keys
+    for child in childrenKeys(items[key]!) {
+      guard !gatheredKeys.contains(key) else { continue }
+      gatherKeys(from: child, gatheredKeys: &gatheredKeys, includeUpstreamIntersections: includeUpstreamIntersections)
+    }
+  }
+  
+  func gatherKeysFromUpstreamIntersection(using key: ObjectIdentifier, gatheredKeys: inout Set<ObjectIdentifier>, includeUpstreamIntersections: Bool) {
+    let item = items[key]!
+    let intersection: Geometry.Intersection<T>
+    switch item {
+    case let .point(point):
+      switch point.shape.parameters {
+      case let ._intersection(i, index: _): intersection = i.inner.object
+      case let ._oppositeIntersection(i, oppositePoint: _): intersection = i.inner.object
+      case ._circumcenter, ._onCircular, ._onStraightAbsolute, ._onStraightNormalized, ._twoStraightsIntersection, .fixed, .free: return
+      }
+    case .circular, .straight, .intersection, .scalar: return
+    }
+    let intersectionKey = intersection.key
+    guard gatheredKeys.isSuperset(of: childrenKeys(intersectionKey)) else { return }
+    gatherKeys(from: intersectionKey, gatheredKeys: &gatheredKeys, includeUpstreamIntersections: includeUpstreamIntersections)
+  }
+}
+

@@ -16,7 +16,7 @@ public extension Canvas {
     // Creating shape
     let shape = Geometry.Scalar.distance(point0.shape, point1.shape)
     let scalar = Scalar(shape, style: style, info: info)
-    items.unsafelyAppend(key: shape.key, value: .scalar(scalar))
+    add(scalar)
     return scalar
   }
 }

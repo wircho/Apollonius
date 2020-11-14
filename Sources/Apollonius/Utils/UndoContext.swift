@@ -1,60 +1,100 @@
-typealias Closure = () -> Void
-
-struct Action {
-  let execute: Closure
-  let revert: Closure
-}
-
-extension Sequence where Element == Action {
-  func grouped() -> Action {
+public typealias Closure = () -> Void
+extension Sequence where Element == UndoContext.Action {
+  func grouped() -> UndoContext.Action {
     let array = Array(self)
-    return Action(
+    return .init(
       execute: { for action in array { action.execute() } },
       revert: { for action in array { action.revert() } }
     )
   }
 }
 
-final class UndoContext {
+final public class UndoContext {
+  public struct Action {
+    let execute: Closure
+    let revert: Closure
+  }
+  
+  final public class FreezeToken {}
+  
   var actions: [Action] = []
   var caret: Int = 0
-  var groupingRange: Range<Int>? = nil
+  var groupingRanges: [Range<Int>] = []
+  var freezeToken: FreezeToken? = nil
+  var frozen: Bool { return freezeToken != nil }
 }
 
-extension UndoContext {
-  func perform(execute: @escaping Closure, revert: @escaping Closure, alreadyExecuted: Bool = false) {
-    let action = Action(execute: execute, revert: revert)
+public extension UndoContext {
+  var canUndo: Bool { return !frozen && caret > 0 }
+  var carRedo: Bool { return !frozen && caret < actions.count }
+  
+  func freeze() -> FreezeToken? {
+    guard !frozen else { return nil }
+    let freezeToken = FreezeToken()
+    self.freezeToken = freezeToken
+    return freezeToken
+  }
+  
+  func unfreeze(token: FreezeToken) {
+    guard token === freezeToken else { return }
+    freezeToken = nil
+  }
+  
+  func clear() {
+    guard !frozen else { return }
+    actions = []
+    caret = 0
+    groupingRanges = []
+  }
+  
+  func unsafeAppend(action: Action) {
     actions.removeSubrange(caret...)
     actions.append(action)
     caret += 1
-    groupingRange = groupingRange.map{ $0.lowerBound ..< caret }
-    if !alreadyExecuted { action.execute() }
+    groupingRanges = groupingRanges.map{ $0.lowerBound ..< caret }
+  }
+  
+  func perform(execute: @escaping Closure, revert: @escaping Closure) {
+    guard !frozen else { return }
+    let action = Action(execute: execute, revert: revert)
+    unsafeAppend(action: action)
+    action.execute()
+  }
+  
+  func perform(_ executeNow: () -> Action) {
+    guard !frozen else { return }
+    let action = executeNow()
+    unsafeAppend(action: action)
   }
   
   func begingGrouping() {
-    groupingRange = caret ..< caret
+    guard !frozen else { return }
+    groupingRanges.append(caret ..< caret)
   }
   
   func endGrouping() {
-    guard let groupingRange = self.groupingRange else { return }
-    self.groupingRange = nil
+    guard !frozen else { return }
+    guard let groupingRange = groupingRanges.last else { return }
+    groupingRanges.removeLast()
     guard groupingRange.upperBound == actions.count, caret == actions.count else { return }
     actions.replaceSubrange(groupingRange, with: [actions[groupingRange].grouped()])
   }
   
   func undo() {
+    guard !frozen else { return }
     guard caret > 0 else { return }
     let action = actions[caret - 1]
     caret -= 1
-    groupingRange = nil
+    groupingRanges = []
     action.revert()
   }
   
   func redo() {
+    guard !frozen else { return }
     guard caret < actions.count else { return }
     let action = actions[caret]
     caret += 1
-    groupingRange = nil
+    groupingRanges = []
     action.execute()
   }
 }

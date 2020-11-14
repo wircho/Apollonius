@@ -27,7 +27,7 @@ public extension Canvas {
     }
     let shape = Geometry.Straight<T>.straight(kind, origin.shape, tip.shape)
     let straight = Straight(shape, style: style, info: info)
-    items.unsafelyAppend(key: shape.key, value: .straight(straight))
+    add(straight)
     return straight
   }
   
@@ -54,7 +54,7 @@ public extension Canvas {
     // Creating shape
     let shape = Geometry.Straight<T>.directed(direction, origin: origin.shape, other: other.shape)
     let straight = Straight(shape, style: style, info: info)
-    items.unsafelyAppend(key: shape.key, value: .straight(straight))
+    add(straight)
     return straight
   }
   

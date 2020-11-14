@@ -5,29 +5,11 @@ public extension Canvas {
 }
 
 public extension Canvas {
-  class PointHandle {
-    public let moveCursor: (XY<T>) -> Void
-    public let point: Point
-    
-    public func move(to xy: XY<T>) {
-      moveCursor(xy)
-    }
-    
-    init<U>(point: Point, cursor: Geometry.Cursor<U>, conversion: @escaping (XY<T>) -> U) {
-      self.point = point
-      self.moveCursor = { xy in
-        cursor.value = conversion(xy)
-      }
-    }
-  }
-}
-
-public extension Canvas {
-  func point(at x: T, y: T, style: PointStyle = .init(), info: Info = .init()) -> Point {
+  func point(at x: T, _ y: T, style: PointStyle = .init(), info: Info = .init()) -> Point {
     let xy = XY(x: .init(value: x), y: .init(value: y))
     let shape = Geometry.Point.fixed(position: xy)
     let point = Point(shape, style: style, info: info)
-    items.unsafelyAppend(key: shape.key, value: .point(point))
+    add(point)
     return point
   }
   
@@ -37,8 +19,8 @@ public extension Canvas {
     let shape = Geometry.Point.free(cursor: cursor)
     let point = Point(shape, style: style, info: info)
     let handle = PointHandle(point: point, cursor: cursor) { $0 }
-    pointHandles[shape.key] = handle
-    items.unsafelyAppend(key: shape.key, value: .point(point))
+    add(handle)
+    add(point)
     return handle
   }
   
@@ -51,8 +33,8 @@ public extension Canvas {
     let handle = PointHandle(point: point, cursor: cursor) { [weak circular] xy in
       return circular?.shape.cursorValue(near: xy) ?? .init(value: 0)
     }
-    pointHandles[shape.key] = handle
-    items.unsafelyAppend(key: shape.key, value: .point(point))
+    add(handle)
+    add(point)
     return handle
   }
   
@@ -67,8 +49,8 @@ public extension Canvas {
       let handle = PointHandle(point: point, cursor: cursor) { [weak straight] xy in
         return straight?.shape.normalizedCursorValue(near: xy) ?? 1/2
       }
-      pointHandles[shape.key] = handle
-      items.unsafelyAppend(key: shape.key, value: .point(point))
+      add(handle)
+      add(point)
       return handle
     case .ray, .line:
       let absoluteValue = straight.shape.absoluteCursorValue(near: xy) ?? .init(value: 0)
@@ -78,8 +60,8 @@ public extension Canvas {
       let handle = PointHandle(point: point, cursor: cursor) { [weak straight] xy in
         return straight?.shape.absoluteCursorValue(near: xy) ?? .init(value: 0)
       }
-      pointHandles[shape.key] = handle
-      items.unsafelyAppend(key: shape.key, value: .point(point))
+      add(handle)
+      add(point)
       return handle
     }
   }
@@ -95,7 +77,7 @@ public extension Canvas {
     // Creating shape
     let shape = Geometry.Point.circumcenter(point0.shape, point1.shape, point2.shape)
     let point = Point(shape, style: style, info: info)
-    items.unsafelyAppend(key: shape.key, value: .point(point))
+    add(point)
     return point
   }
   
@@ -105,7 +87,7 @@ public extension Canvas {
     // Creating shape
     let shape = Geometry.Point.intersection(straight0.shape, straight1.shape)
     let point = Point(shape, style: style, info: info)
-    items.unsafelyAppend(key: shape.key, value: .point(point))
+    add(point)
     return point
   }
   
@@ -156,8 +138,8 @@ public extension Canvas {
       let candidateIndices = [.first, .second].filter { satisfies(condition, intersection.shape.value?[$0]) }
       let shapes = candidateIndices.map{ Geometry.Point.intersection(intersection.shape, index: $0) }
       let points = shapes.map{ Point($0, style: style, info: info) }
-      if shapes.count > 0 { items.unsafelyAppend(key: intersection.shape.key, value: .intersection(intersection)) }
-      for i in 0 ..< shapes.count { items.unsafelyAppend(key: shapes[i].key, value: .point(points[i])) }
+      if shapes.count > 0 { add(intersection) }
+      for i in 0 ..< shapes.count { add(points[i]) }
       return points
     case 1:
       // 1 known intersection point
@@ -172,8 +154,8 @@ public extension Canvas {
           guard newPointSatisfiesCondition else { return knownPointSatisfiesCondition ? [knownPoint] : [] }
           let shape = Geometry.Point.oppositeIntersection(intersection.shape, from: knownPoint.shape)
           let point = Point(shape, style: style, info: info)
-          items.unsafelyAppend(key: intersection.shape.key, value: .intersection(intersection))
-          items.unsafelyAppend(key: shape.key, value: .point(point))
+          add(intersection)
+          add(point)
           return knownPointSatisfiesCondition ? [knownPoint, point] : [point]
       }
       // The known intersection was created as an indexed intersection point
@@ -190,7 +172,7 @@ public extension Canvas {
       // New point satisfies condition. Creating...
       let shape = Geometry.Point.intersection(intersection.inner.object, index: index)
       let point = Point(shape, style: style, info: info)
-      items.unsafelyAppend(key: shape.key, value: .point(point))
+      add(point)
       return knownPointSatisfiesCondition ? [knownPoint, point] : [point]
     default:
       // Two or more known intersection points

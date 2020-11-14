@@ -22,6 +22,19 @@ extension SortedDictionary {
     unsortedDictionary[key] = value
   }
   
+  mutating func unsafelyInsert(key: Key, value: Value, at index: Int) {
+    guard !unsortedDictionary.keys.contains(key) else { fatalError("Key exists: \(key)") }
+    keys.insert(key, at: index)
+    unsortedDictionary[key] = value
+  }
+  
+  mutating func unsafelyRemove(key: Key) -> Int {
+    let index = (keys.firstIndex {  $0 == key })!
+    keys.remove(at: index)
+    unsortedDictionary[key] = nil
+    return index
+  }
+  
   subscript(_ key: Key) -> Value? {
     get { return unsortedDictionary[key] }
     set {
