@@ -15,11 +15,11 @@ public protocol FigureProtocol {
   init(_ shape: F, style: Style, info: Info)
 }
 
-public protocol FigureInfo {
+public protocol FigureInfo: Codable {
   init()
 }
 
-public protocol FigureStyle {
+public protocol FigureStyle: Codable {
   init()
 }
 
@@ -31,7 +31,7 @@ public struct EmptyIntersectionStyle: FigureStyle {
   public init() {}
 }
 
-public final class Canvas<T: Real, Meta: CanvasMetaProtocol> {
+public final class Canvas<T: Real & Codable, Meta: CanvasMetaProtocol> {
   public typealias Info = Meta.Info
   public typealias PointStyle = Meta.PointStyle
   public typealias StraightStyle = Meta.StraightStyle
@@ -40,8 +40,8 @@ public final class Canvas<T: Real, Meta: CanvasMetaProtocol> {
   public typealias IntersectionStyle = EmptyIntersectionStyle
   
   public let undoContext = UndoContext()
-  var items: SortedDictionary<ObjectIdentifier, Item> = [:]
-  var pointHandles: Dictionary<ObjectIdentifier, PointHandle> = [:]
+  var items: SortedDictionary<ShapeKey, Item> = [:]
+  var pointHandles: Dictionary<ShapeKey, PointHandle> = [:]
 }
 
 public extension Canvas {
@@ -51,25 +51,25 @@ public extension Canvas {
     }
   }
   
-  func update(keys: Set<ObjectIdentifier>) {
+  func update(keys: Set<ShapeKey>) {
     for key in items.keys {
       guard keys.contains(key) else { continue }
       items[key]?.update()
     }
   }
   
-  func update(from key: ObjectIdentifier) {
+  func update(from key: ShapeKey) {
     update(keys: gatherKeys(from: key, includeUpstreamIntersections: false))
   }
 }
 
 public extension Canvas {
-  final class Figure<F: Shape, Style: FigureStyle>: FigureProtocol where F.T == T {
-    public let shape: F
+  final class Figure<S: Shape, Style: FigureStyle>: FigureProtocol where S.T == T {
+    public let shape: S
     public var style: Style
     public var info: Info
     
-    public init(_ shape: F, style: Style = .init(), info: Info = .init()) {
+    public init(_ shape: S, style: Style = .init(), info: Info = .init()) {
       self.shape = shape
       self.style = style
       self.info = info
@@ -113,12 +113,4 @@ extension Canvas.Item {
     case let .intersection(figure): figure.shape.update()
     }
   }
-}
-
-extension Shape {
-  var key: ObjectIdentifier { return .init(self) }
-}
-
-extension UnownedShapeConvertibleInternal {
-  var key: ObjectIdentifier { return .init(inner.object) }
 }

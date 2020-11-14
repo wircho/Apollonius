@@ -22,6 +22,7 @@ final public class UndoContext {
   var groupingRanges: [Range<Int>] = []
   var freezeToken: FreezeToken? = nil
   var frozen: Bool { return freezeToken != nil }
+  var memory = 0
 }
 
 public extension UndoContext {
@@ -48,10 +49,13 @@ public extension UndoContext {
   }
   
   func unsafeAppend(action: Action) {
+    guard memory > 0 else { return }
     actions.removeSubrange(caret...)
     actions.append(action)
-    caret += 1
-    groupingRanges = groupingRanges.map{ $0.lowerBound ..< caret }
+    let removeFirst = actions.count > memory
+    if removeFirst { actions.removeFirst() }
+    caret = actions.count
+    groupingRanges = groupingRanges.map{ (removeFirst ? $0.lowerBound - 1 : $0.lowerBound) ..< caret }
   }
   
   func perform(execute: @escaping Closure, revert: @escaping Closure) {

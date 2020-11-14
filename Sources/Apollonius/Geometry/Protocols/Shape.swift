@@ -1,7 +1,7 @@
 import Numerics
 
-public protocol Shape: AnyObject {
-  associatedtype T: Real
+public protocol Shape: AnyObject, RepresentableToProxy where Proxy: Codable {
+  associatedtype T: Real & Codable
   associatedtype Parameters
   associatedtype Value
   var index: Int { get }
@@ -58,4 +58,39 @@ func ==<F0: Shape, F1: UnownedShapeConvertibleInternal>(lhs: F0, rhs: F1) -> Boo
 
 func ==<F0: UnownedShapeConvertibleInternal, F1: Shape>(lhs: F0, rhs: F1) -> Bool where F0.ObjectType == F1, F0.T == F1.T {
   return lhs.asUnownedShape.inner.object === rhs
+}
+
+extension Counter {
+  static var shapeIndex = Counter()
+  static var shapeKey = Counter()
+}
+
+public struct ShapeKey: Hashable {
+  let value: String
+  static var dictionary: [ObjectIdentifier: ShapeKey] = [:]
+  
+  init<S: AnyObject>(unsafelyWithObject shape: S) {
+    value = String(Counter.shapeKey.newIndex())
+    ShapeKey.dictionary[ObjectIdentifier(shape)] = self
+  }
+  
+  init<S: Shape>(shape: S) {
+    self.init(unsafelyWithObject: shape)
+  }
+  
+  init(value: String) {
+    self.value = value
+  }
+}
+
+extension Shape {
+  var key: ShapeKey {
+    return ShapeKey.dictionary[ObjectIdentifier(self)] ?? ShapeKey(shape: self)
+  }
+}
+
+extension UnownedShapeConvertibleInternal {
+  var key: ShapeKey {
+    return ShapeKey.dictionary[ObjectIdentifier(inner.object)] ?? ShapeKey(unsafelyWithObject: inner.object)
+  }
 }

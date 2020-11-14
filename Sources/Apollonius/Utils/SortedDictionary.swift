@@ -47,3 +47,6 @@ extension SortedDictionary {
     }
   }
 }
+
+extension SortedDictionary: Encodable where Key: Encodable, Value: Encodable {}
+extension SortedDictionary: Decodable where Key: Decodable, Value: Decodable {}

@@ -25,7 +25,7 @@ extension Canvas {
     )
   }
   
-  func remove(_ key: ObjectIdentifier) -> [Item] {
+  func remove(_ key: ShapeKey) -> [Item] {
     let keysToDelete = gatherKeys(from: key, includeUpstreamIntersections: true)
     undoContext.begingGrouping()
     var deletedItems: [Item] = []

@@ -20,7 +20,7 @@ public extension Geometry {
       public let second: XY<T>?
     }
     
-    public let index = GlobalCounter.index
+    public let index = Counter.shapeIndex.newIndex()
     public var value: Value? = nil
     public let parameters: IntersectionParameters<T>
     public var children: [UnownedShape<T>] = []
@@ -111,7 +111,7 @@ extension Geometry.Intersection: Shape {
 }
 
 public extension Geometry {
-  enum IntersectionIndex {
+  enum IntersectionIndex: String, Codable {
     case first, second
   }
 }
