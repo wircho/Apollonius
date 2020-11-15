@@ -36,7 +36,7 @@ public struct UnownedShape<T: Real> {
   public func append(child: UnownedShape<T>) { _appendChild(child) }
   public func update() { _update() }
   
-  init<F: Shape>(_ shape: F) where F.T == T {
+  init<S: Shape>(_ shape: S) where S.T == T {
     self.inner = .init(shape)
     self._children = { [weak shape] in shape!.children }
     self._appendChild = { [weak shape] child in shape!.children.append(child) }
@@ -48,15 +48,15 @@ extension UnownedShape: UnownedShapeConvertibleInternal {
   public var asUnownedShape: UnownedShape<T> { return self }
 }
 
-func ==<F: UnownedShapeConvertible>(lhs: F, rhs: F) -> Bool {
+func ==<S: UnownedShapeConvertible>(lhs: S, rhs: S) -> Bool {
   return lhs.asUnownedShape.inner.object === rhs.asUnownedShape.inner.object
 }
 
-func ==<F0: Shape, F1: UnownedShapeConvertibleInternal>(lhs: F0, rhs: F1) -> Bool where F1.ObjectType == F0, F0.T == F1.T {
+func ==<S0: Shape, S1: UnownedShapeConvertibleInternal>(lhs: S0, rhs: S1) -> Bool where S1.ObjectType == S0, S0.T == S1.T {
   return lhs === rhs.asUnownedShape.inner.object
 }
 
-func ==<F0: UnownedShapeConvertibleInternal, F1: Shape>(lhs: F0, rhs: F1) -> Bool where F0.ObjectType == F1, F0.T == F1.T {
+func ==<S0: UnownedShapeConvertibleInternal, S1: Shape>(lhs: S0, rhs: S1) -> Bool where S0.ObjectType == S1, S0.T == S1.T {
   return lhs.asUnownedShape.inner.object === rhs
 }
 

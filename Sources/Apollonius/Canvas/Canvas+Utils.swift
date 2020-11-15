@@ -49,27 +49,27 @@ extension Canvas {
 }
 
 extension Canvas {
-  func knownPointsKeys<Figure: FigureProtocol>(_ figure: Figure) -> Set<ObjectIdentifier> where Figure.F: Curve {
+  func knownPointsKeys<Figure: FigureProtocol>(_ figure: Figure) -> Set<ObjectIdentifier> where Figure.S: Curve {
     return Set(figure.shape.knownPoints.map{ $0.key })
   }
   
-  func knownPoints<Figure: FigureProtocol>(_ figure: Figure) -> [Point] where Figure.F: Curve {
+  func knownPoints<Figure: FigureProtocol>(_ figure: Figure) -> [Point] where Figure.S: Curve {
     return knownPointsKeys(figure).map{ items[$0]!.point! }
   }
   
-  func commonKnownPointsKeys<Figure0: FigureProtocol, Figure1: FigureProtocol>(_ figure0: Figure0, _ figure1: Figure1) -> Set<ObjectIdentifier> where Figure0.F: Curve, Figure1.F: Curve {
+  func commonKnownPointsKeys<Figure0: FigureProtocol, Figure1: FigureProtocol>(_ figure0: Figure0, _ figure1: Figure1) -> Set<ObjectIdentifier> where Figure0.S: Curve, Figure1.S: Curve {
     return knownPointsKeys(figure0).intersection(knownPointsKeys(figure1))
   }
   
-  func commonKnownPoints<Figure0: FigureProtocol, Figure1: FigureProtocol>(_ figure0: Figure0, _ figure1: Figure1) -> [Point] where Figure0.F: Curve, Figure1.F: Curve {
+  func commonKnownPoints<Figure0: FigureProtocol, Figure1: FigureProtocol>(_ figure0: Figure0, _ figure1: Figure1) -> [Point] where Figure0.S: Curve, Figure1.S: Curve {
     return commonKnownPointsKeys(figure0, figure1).map{ items[$0]!.point! }
   }
   
-  func commonKnownPointsKeys<Figure0: FigureProtocol, Figure1: FigureProtocol, Figure2: FigureProtocol>(_ figure0: Figure0, _ figure1: Figure1, _ figure2: Figure2) -> Set<ObjectIdentifier> where Figure0.F: Curve, Figure1.F: Curve, Figure2.F: Curve {
+  func commonKnownPointsKeys<Figure0: FigureProtocol, Figure1: FigureProtocol, Figure2: FigureProtocol>(_ figure0: Figure0, _ figure1: Figure1, _ figure2: Figure2) -> Set<ObjectIdentifier> where Figure0.S: Curve, Figure1.S: Curve, Figure2.S: Curve {
     return knownPointsKeys(figure0).intersection(knownPointsKeys(figure1)).intersection(knownPointsKeys(figure2))
   }
   
-  func commonKnownPoints<Figure0: FigureProtocol, Figure1: FigureProtocol, Figure2: FigureProtocol>(_ figure0: Figure0, _ figure1: Figure1, _ figure2: Figure2) -> [Point] where Figure0.F: Curve, Figure1.F: Curve, Figure2.F: Curve {
+  func commonKnownPoints<Figure0: FigureProtocol, Figure1: FigureProtocol, Figure2: FigureProtocol>(_ figure0: Figure0, _ figure1: Figure1, _ figure2: Figure2) -> [Point] where Figure0.S: Curve, Figure1.S: Curve, Figure2.S: Curve {
     return commonKnownPointsKeys(figure0, figure1, figure2).map{ items[$0]!.point! }
   }
 }

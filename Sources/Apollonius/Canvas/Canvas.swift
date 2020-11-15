@@ -8,11 +8,11 @@ public protocol CanvasMetaProtocol {
 }
 
 public protocol FigureProtocol {
-  associatedtype F: Shape
+  associatedtype S: Shape
   associatedtype Style: FigureStyle
   associatedtype Info: FigureInfo
-  var shape: F { get }
-  init(_ shape: F, style: Style, info: Info)
+  var shape: S { get }
+  init(_ shape: S, style: Style, info: Info)
 }
 
 public protocol FigureInfo {
@@ -64,12 +64,12 @@ public extension Canvas {
 }
 
 public extension Canvas {
-  final class Figure<F: Shape, Style: FigureStyle>: FigureProtocol where F.T == T {
-    public let shape: F
+  final class Figure<S: Shape, Style: FigureStyle>: FigureProtocol where S.T == T {
+    public let shape: S
     public var style: Style
     public var info: Info
     
-    public init(_ shape: F, style: Style = .init(), info: Info = .init()) {
+    public init(_ shape: S, style: Style = .init(), info: Info = .init()) {
       self.shape = shape
       self.style = style
       self.info = info
