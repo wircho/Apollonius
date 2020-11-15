@@ -5,39 +5,39 @@ infix operator ><: MultiplicationPrecedence
 
 public protocol Coordinate: Dimension {}
 
-public struct X<T: Real>: Coordinate {
+public struct X<T: Real & Codable>: Coordinate {
     public let value: T
     public init(value: T) { self.value = value }
 }
 
-public struct Y<T: Real>: Coordinate {
+public struct Y<T: Real & Codable>: Coordinate {
     public let value: T
     public init(value: T) { self.value = value }
 }
 
-public struct Length<T: Real>: Metric {
+public struct Length<T: Real & Codable>: Metric {
     public let value: T
     public init(value: T) { self.value = value }
 }
 
-public struct Ratio<T: Real>: Value {
+public struct Ratio<T: Real & Codable>: Value {
     public let value: T
     public init(value: T) { self.value = value }
 }
 
-public typealias DX<T: Real> = X<T>.Difference
-public typealias DY<T: Real> = Y<T>.Difference
+public typealias DX<T: Real & Codable> = X<T>.Difference
+public typealias DY<T: Real & Codable> = Y<T>.Difference
 
 public extension Difference where D: Coordinate {
     var length: Length<T> { return .init(value: value) }
 }
 
-public struct XY<T: Real> {
+public struct XY<T: Real & Codable> {
     public var x: X<T>
     public var y: Y<T>
 }
 
-public struct DXY<T: Real> {
+public struct DXY<T: Real & Codable> {
     public var dx: DX<T>
     public var dy: DY<T>
 }

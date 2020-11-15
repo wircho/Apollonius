@@ -1,7 +1,7 @@
 import Numerics
 
 public extension Geometry {
-  enum ScalarParameters<T: Real> {
+  enum ScalarParameters<T: Real & Codable> {
     case _distance(_ point0: UnownedPoint<T>, _ point1: UnownedPoint<T>)
     
     public static func distance(_ point0: Point<T>, _ point1: Point<T>) -> ScalarParameters<T> {
@@ -9,7 +9,7 @@ public extension Geometry {
     }
   }
   
-  final class Scalar<T: Real> {
+  final class Scalar<T: Real & Codable> {
     public let index = Counter.shapes.newIndex()
     public var value: Length<T>? = nil
     public let parameters: ScalarParameters<T>
@@ -43,7 +43,7 @@ public extension Geometry.Scalar {
   }
 }
 
-public struct UnownedScalar<T: Real>: UnownedShapeConvertibleInternal {
+public struct UnownedScalar<T: Real & Codable>: UnownedShapeConvertibleInternal {
   let inner: Unowned<Geometry.Scalar<T>>
   public let asUnownedShape: UnownedShape<T>
   

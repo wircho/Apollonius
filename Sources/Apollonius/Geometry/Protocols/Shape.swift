@@ -1,7 +1,7 @@
 import Numerics
 
 public protocol Shape: AnyObject {
-  associatedtype T: Real
+  associatedtype T: Real & Codable
   associatedtype Parameters
   associatedtype Value
   var index: Int { get }
@@ -19,7 +19,7 @@ public extension Shape {
 }
 
 public protocol UnownedShapeConvertible {
-  associatedtype T: Real
+  associatedtype T: Real & Codable
   var asUnownedShape: UnownedShape<T> { get }
 }
 
@@ -28,7 +28,7 @@ protocol UnownedShapeConvertibleInternal: UnownedShapeConvertible {
   var inner: Unowned<ObjectType> { get }
 }
 
-public struct UnownedShape<T: Real> {
+public struct UnownedShape<T: Real & Codable> {
   let _children: () -> [UnownedShape<T>]
   let _appendChild: (UnownedShape<T>) -> Void
   let _update: () -> Void

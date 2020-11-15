@@ -1,7 +1,7 @@
 import Numerics
 
 public protocol Value: Comparable {
-    associatedtype T: Real
+    associatedtype T: Real & Codable
     var value: T { get }
     init(value: T)
 }

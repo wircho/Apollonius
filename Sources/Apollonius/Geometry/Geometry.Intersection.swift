@@ -1,7 +1,7 @@
 import Numerics
 
 public extension Geometry {
-  enum IntersectionParameters<T: Real> {
+  enum IntersectionParameters<T: Real & Codable> {
     case _straightCircular(UnownedStraight<T>, UnownedCircular<T>)
     case _twoCirculars(UnownedCircular<T>, UnownedCircular<T>)
     
@@ -14,7 +14,7 @@ public extension Geometry {
     }
   }
   
-  final class Intersection<T: Real> {
+  final class Intersection<T: Real & Codable> {
     public struct Value {
       public let first: XY<T>?
       public let second: XY<T>?
@@ -111,7 +111,7 @@ extension Geometry.Intersection: ShapeInternal {
 }
 
 public extension Geometry {
-  enum IntersectionIndex {
+  enum IntersectionIndex: String, Codable {
     case first, second
   }
 }
@@ -151,7 +151,7 @@ public extension Geometry.Intersection {
   }
 }
 
-public struct UnownedIntersection<T: Real>: UnownedShapeConvertibleInternal {
+public struct UnownedIntersection<T: Real & Codable>: UnownedShapeConvertibleInternal {
   let inner: Unowned<Geometry.Intersection<T>>
   public let asUnownedShape: UnownedShape<T>
   

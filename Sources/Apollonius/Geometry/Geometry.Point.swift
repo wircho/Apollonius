@@ -1,7 +1,7 @@
 import Numerics
 
 public extension Geometry {
-  enum PointParameters<T: Real> {
+  enum PointParameters<T: Real & Codable> {
     case fixed(position: XY<T>)
     case free(cursor: Cursor<XY<T>>)
     case _onStraightAbsolute(UnownedStraight<T>, cursor: Cursor<Length<T>>)
@@ -41,7 +41,7 @@ public extension Geometry {
     }
   }
   
-  final class Point<T: Real> {
+  final class Point<T: Real & Codable> {
     public let index = Counter.shapes.newIndex()
     public var value: XY<T>? = nil
     public let parameters: PointParameters<T>
@@ -132,7 +132,7 @@ public extension Geometry {
   }
 }
 
-func _circumcenter<T: Real>(_ xy0: XY<T>, _ xy1: XY<T>, _ xy2: XY<T>) -> XY<T>? { return circumcenter(xy0, xy1, xy2) }
+func _circumcenter<T: Real & Codable>(_ xy0: XY<T>, _ xy1: XY<T>, _ xy2: XY<T>) -> XY<T>? { return circumcenter(xy0, xy1, xy2) }
 
 extension Geometry.Point: ShapeInternal {
   public func newValue() -> XY<T>? {
@@ -216,7 +216,7 @@ public extension Geometry.Point {
   }
 }
 
-public struct UnownedPoint<T: Real>: UnownedShapeConvertibleInternal {
+public struct UnownedPoint<T: Real & Codable>: UnownedShapeConvertibleInternal {
   let inner: Unowned<Geometry.Point<T>>
   public let asUnownedShape: UnownedShape<T>
   

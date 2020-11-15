@@ -1,15 +1,15 @@
 import Numerics
 
 public extension Geometry {
-  enum StraightKind {
+  enum StraightKind: String, Codable {
     case line, segment, ray
   }
   
-  enum StraightDirection {
+  enum StraightDirection: String, Codable {
     case parallel, perpendicular
   }
   
-  enum StraightDefinition<T: Real> {
+  enum StraightDefinition<T: Real & Codable> {
     case _between(origin: UnownedPoint<T>, tip: UnownedPoint<T>)
     case _directed(direction: StraightDirection, origin: UnownedPoint<T>, other: UnownedStraight<T>)
     
@@ -30,7 +30,7 @@ public extension Geometry {
     }
   }
   
-  struct StraightParameters<T: Real> {
+  struct StraightParameters<T: Real & Codable> {
     let kind: StraightKind
     let definition: StraightDefinition<T>
     
@@ -68,7 +68,7 @@ public extension Geometry {
     }
   }
   
-  final class Straight<T: Real> {
+  final class Straight<T: Real & Codable> {
     public struct Value {
       public let origin: XY<T>
       public let tip: XY<T>
@@ -218,7 +218,7 @@ extension Geometry.Straight {
   }
 }
 
-public struct UnownedStraight<T: Real>: UnownedShapeConvertibleInternal {
+public struct UnownedStraight<T: Real & Codable>: UnownedShapeConvertibleInternal {
   let inner: Unowned<Geometry.Straight<T>>
   public let asUnownedCurve: UnownedCurve<T>
   // Computed

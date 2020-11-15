@@ -15,11 +15,11 @@ public protocol FigureProtocol {
   init(_ shape: S, style: Style, info: Info)
 }
 
-public protocol FigureInfo {
+public protocol FigureInfo: Codable {
   init()
 }
 
-public protocol FigureStyle {
+public protocol FigureStyle: Codable {
   init()
 }
 
@@ -31,7 +31,7 @@ public struct EmptyIntersectionStyle: FigureStyle {
   public init() {}
 }
 
-public final class Canvas<T: Real, Meta: CanvasMetaProtocol> {
+public final class Canvas<T: Real & Codable, Meta: CanvasMetaProtocol> {
   public typealias Info = Meta.Info
   public typealias PointStyle = Meta.PointStyle
   public typealias StraightStyle = Meta.StraightStyle

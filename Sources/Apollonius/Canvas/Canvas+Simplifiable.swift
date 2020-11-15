@@ -6,10 +6,18 @@ private func fatal<T>() -> T {
   fatalError("Unsupported.")
 }
 
-struct Alias<S: Shape> {
+struct Alias<S: Shape>: Codable {
   let value: String
   
   init(_ value: String) { self.value = value }
+  
+  func encode(to encoder: Encoder) throws {
+    try value.encode(to: encoder)
+  }
+  
+  init(from decoder: Decoder) throws {
+    try self.init(.init(from: decoder))
+  }
 }
 
 extension ObjectIdentifier {
@@ -49,23 +57,23 @@ class CanvasContext {
   
   func unsafe<S: Shape>(_ alias: Alias<S>) -> S { return aliasDictionary[alias.value]!.object as! S }
   
-  static func >><T: Real>(context: CanvasContext, alias: Alias<Geometry.Point<T>>) -> UnownedPoint<T>  {
+  static func >><T: Real & Codable>(context: CanvasContext, alias: Alias<Geometry.Point<T>>) -> UnownedPoint<T>  {
     return .init(context.unsafe(alias))
   }
   
-  static func >><T: Real>(context: CanvasContext, alias: Alias<Geometry.Straight<T>>) -> UnownedStraight<T>  {
+  static func >><T: Real & Codable>(context: CanvasContext, alias: Alias<Geometry.Straight<T>>) -> UnownedStraight<T>  {
     return .init(context.unsafe(alias))
   }
   
-  static func >><T: Real>(context: CanvasContext, alias: Alias<Geometry.Circular<T>>) -> UnownedCircular<T>  {
+  static func >><T: Real & Codable>(context: CanvasContext, alias: Alias<Geometry.Circular<T>>) -> UnownedCircular<T>  {
     return .init(context.unsafe(alias))
   }
   
-  static func >><T: Real>(context: CanvasContext, alias: Alias<Geometry.Intersection<T>>) -> UnownedIntersection<T>  {
+  static func >><T: Real & Codable>(context: CanvasContext, alias: Alias<Geometry.Intersection<T>>) -> UnownedIntersection<T>  {
     return .init(context.unsafe(alias))
   }
   
-  static func >><T: Real>(context: CanvasContext, alias: Alias<Geometry.Scalar<T>>) -> UnownedScalar<T>  {
+  static func >><T: Real & Codable>(context: CanvasContext, alias: Alias<Geometry.Scalar<T>>) -> UnownedScalar<T>  {
     return .init(context.unsafe(alias))
   }
 }
@@ -73,8 +81,8 @@ class CanvasContext {
 extension Canvas: Simplifiable {
   typealias Context = CanvasContext
   
-  struct Simplified {
-    struct Element {
+  struct Simplified: Codable {
+    struct Element: Codable {
       let alias: String
       let item: Item.Simplified
     }
@@ -122,7 +130,7 @@ extension Canvas: Simplifiable {
 extension Canvas.Item: Simplifiable {
   typealias Context = CanvasContext
   
-  struct Simplified {
+  struct Simplified: Codable {
     let point: Canvas.Point.Simplified?
     let straight: Canvas.Straight.Simplified?
     let circular: Canvas.Circular.Simplified?
@@ -183,16 +191,18 @@ extension Canvas.Figure: Simplifiable where S: ShapeInternal {
   }
 }
 
+extension Canvas.Figure.Simplified: Codable where S.Simplified: Codable {}
+
 extension Geometry.Intersection: Simplifiable {
   typealias Context = CanvasContext
   
-  struct Simplified {
-    struct StraightCircular {
+  struct Simplified: Codable {
+    struct StraightCircular: Codable {
       let straight: Alias<Geometry.Straight<T>>
       let circular: Alias<Geometry.Circular<T>>
     }
     
-    struct TwoCirculars {
+    struct TwoCirculars: Codable {
       let circular0, circular1: Alias<Geometry.Circular<T>>
     }
     
@@ -228,8 +238,8 @@ extension Geometry.Intersection: Simplifiable {
 extension Geometry.Scalar: Simplifiable {
   typealias Context = CanvasContext
   
-  struct Simplified {
-    struct Distance {
+  struct Simplified: Codable {
+    struct Distance: Codable {
       let point0, point1: Alias<Geometry.Point<T>>
     }
     
@@ -259,20 +269,20 @@ extension Geometry.Scalar: Simplifiable {
 extension Geometry.Circular: Simplifiable {
   typealias Context = CanvasContext
   
-  struct Simplified {
-    struct Arc {
+  struct Simplified: Codable {
+    struct Arc: Codable {
       let point0, point1, point2: Alias<Geometry.Point<T>>
     }
     
-    struct Between {
+    struct Between: Codable {
       let center, tip: Alias<Geometry.Point<T>>
     }
     
-    struct Circumcircle {
+    struct Circumcircle: Codable {
       let point0, point1, point2: Alias<Geometry.Point<T>>
     }
     
-    struct With {
+    struct With: Codable {
       let center: Alias<Geometry.Point<T>>
       let radius: Alias<Geometry.Scalar<T>>
     }
@@ -321,12 +331,12 @@ extension Geometry.Circular: Simplifiable {
 extension Geometry.Straight: Simplifiable {
   typealias Context = CanvasContext
   
-  struct Simplified {
-    struct Between {
+  struct Simplified: Codable {
+    struct Between: Codable {
       let origin, tip: Alias<Geometry.Point<T>>
     }
     
-    struct Directed {
+    struct Directed: Codable {
       let origin: Alias<Geometry.Point<T>>
       let other: Alias<Geometry.Straight<T>>
       let direction: Geometry.StraightDirection
@@ -366,36 +376,36 @@ extension Geometry.Straight: Simplifiable {
 extension Geometry.Point: Simplifiable {
   typealias Context = CanvasContext
   
-  struct Simplified {
-    struct Circumcenter {
+  struct Simplified: Codable {
+    struct Circumcenter: Codable {
       let point0, point1, point2: Alias<Geometry.Point<T>>
     }
     
-    struct Intersection {
+    struct Intersection: Codable {
       let intersection: Alias<Geometry.Intersection<T>>
       let index: Geometry.IntersectionIndex
     }
     
-    struct OnCircular {
+    struct OnCircular: Codable {
       let circular: Alias<Geometry.Circular<T>>
       let cursorValue: T
     }
     
-    struct OnStraight {
+    struct OnStraight: Codable {
       let straight: Alias<Geometry.Straight<T>>
       let cursorValue: T
     }
     
-    struct OppositeIntersection {
+    struct OppositeIntersection: Codable {
       let intersection: Alias<Geometry.Intersection<T>>
       let oppositePoint: Alias<Geometry.Point<T>>
     }
     
-    struct TwoStraightsIntersection {
+    struct TwoStraightsIntersection: Codable {
       let straight0, straight1: Alias<Geometry.Straight<T>>
     }
     
-    struct Position {
+    struct Position: Codable {
       let x, y: T
     }
     

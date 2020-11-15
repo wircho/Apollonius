@@ -1,7 +1,7 @@
 import Numerics
 
 public extension Geometry {
-  enum CircularParameters<T: Real> {
+  enum CircularParameters<T: Real & Codable> {
     case _between(center: UnownedPoint<T>, tip: UnownedPoint<T>)
     case _with(center: UnownedPoint<T>, radius: UnownedScalar<T>)
     case _circumcircle(UnownedPoint<T>, UnownedPoint<T>, UnownedPoint<T>)
@@ -24,7 +24,7 @@ public extension Geometry {
     }
   }
   
-  final class Circular<T: Real> {
+  final class Circular<T: Real & Codable> {
     public struct Value {
       public let center: XY<T>
       public let radius: Length<T>
@@ -140,7 +140,7 @@ public extension Geometry.Circular {
   }
 }
 
-public struct UnownedCircular<T: Real>: UnownedShapeConvertibleInternal {
+public struct UnownedCircular<T: Real & Codable>: UnownedShapeConvertibleInternal {
   let inner: Unowned<Geometry.Circular<T>>
   public let asUnownedCurve: UnownedCurve<T>
   // Computed

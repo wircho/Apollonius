@@ -1,6 +1,6 @@
 import Numerics
 
-public struct Angle<T: Real>: Value {
+public struct Angle<T: Real & Codable>: Value {
     public let value: T
     public init(value: T) { self.value = value }
 }

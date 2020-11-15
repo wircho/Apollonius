@@ -1,6 +1,6 @@
 import Numerics
 
-public struct AngleInterval<T: Real> {
+public struct AngleInterval<T: Real & Codable> {
   public let angle0: Angle<T>
   public let angle1: Angle<T>
   
