@@ -3,3 +3,5 @@ struct Unowned<Wrapped: AnyObject> {
     var object: Wrapped { return _object! }
     init(_ object: Wrapped) { self._object = object }
 }
+
+typealias AnyUnowned = Unowned<AnyObject>
