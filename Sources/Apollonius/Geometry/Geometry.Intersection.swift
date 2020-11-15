@@ -41,7 +41,7 @@ public extension Geometry {
   }
 }
 
-extension Geometry.Intersection: Shape {
+extension Geometry.Intersection: ShapeInternal {
   private func intersections(between straight: Geometry.Straight<T>, and circular: Geometry.Circular<T>) -> Value? {
     guard let straightValue = straight.value, let circularValue = circular.value else { return nil }
     let vector = straightValue.vector

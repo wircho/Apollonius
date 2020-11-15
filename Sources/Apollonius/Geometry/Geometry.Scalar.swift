@@ -27,7 +27,7 @@ public extension Geometry {
   }
 }
 
-extension Geometry.Scalar: Shape {
+extension Geometry.Scalar: ShapeInternal {
   public func newValue() -> Length<T>? {
     switch parameters {
     case let ._distance(point0, point1):

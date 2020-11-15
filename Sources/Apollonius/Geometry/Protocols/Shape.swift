@@ -12,6 +12,8 @@ public protocol Shape: AnyObject {
   func newValue() -> Value?
 }
 
+protocol ShapeInternal: Shape, Simplifiable where Context == CanvasContext {}
+
 public extension Shape {
   func update() { value = newValue() }
 }

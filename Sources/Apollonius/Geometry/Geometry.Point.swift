@@ -134,7 +134,7 @@ public extension Geometry {
 
 func _circumcenter<T: Real>(_ xy0: XY<T>, _ xy1: XY<T>, _ xy2: XY<T>) -> XY<T>? { return circumcenter(xy0, xy1, xy2) }
 
-extension Geometry.Point: Shape {
+extension Geometry.Point: ShapeInternal {
   public func newValue() -> XY<T>? {
     switch parameters {
     case let .fixed(position):

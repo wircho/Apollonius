@@ -105,7 +105,7 @@ public extension Geometry {
   }
 }
 
-extension Geometry.Straight: Curve {
+extension Geometry.Straight: Curve, ShapeInternal {
   public func newValue() -> Geometry.Straight<T>.Value? {
     switch parameters.definition {
     case let ._between(origin, tip):

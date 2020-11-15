@@ -83,7 +83,7 @@ public extension Geometry {
   }
 }
 
-extension Geometry.Circular: Curve {
+extension Geometry.Circular: Curve, ShapeInternal {
   public func newValue() -> Geometry.Circular<T>.Value? {
     switch parameters {
     case let ._between(center, tip):
