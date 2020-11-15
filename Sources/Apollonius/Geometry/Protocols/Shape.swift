@@ -59,3 +59,7 @@ func ==<F0: Shape, F1: UnownedShapeConvertibleInternal>(lhs: F0, rhs: F1) -> Boo
 func ==<F0: UnownedShapeConvertibleInternal, F1: Shape>(lhs: F0, rhs: F1) -> Bool where F0.ObjectType == F1, F0.T == F1.T {
   return lhs.asUnownedShape.inner.object === rhs
 }
+
+extension Counter {
+  static var shapes = Counter()
+}

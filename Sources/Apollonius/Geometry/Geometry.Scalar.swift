@@ -10,7 +10,7 @@ public extension Geometry {
   }
   
   final class Scalar<T: Real> {
-    public let index = GlobalCounter.index
+    public let index = Counter.shapes.newIndex()
     public var value: Length<T>? = nil
     public let parameters: ScalarParameters<T>
     public var children: [UnownedShape<T>] = []

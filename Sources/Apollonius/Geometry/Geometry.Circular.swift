@@ -31,7 +31,7 @@ public extension Geometry {
       public let interval: AngleInterval<T>?
     }
     
-    public let index = GlobalCounter.index
+    public let index = Counter.shapes.newIndex()
     public var value: Value? = nil
     public let parameters: CircularParameters<T>
     public var children: [UnownedShape<T>] = []

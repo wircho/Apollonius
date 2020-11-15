@@ -1,8 +1,8 @@
-enum GlobalCounter {
+struct Counter {
   
-  static var _index = 0
+  var _index = 0
   
-  static var index: Int {
+  mutating func newIndex() -> Int {
     let index = _index
     _index += 1
     return index

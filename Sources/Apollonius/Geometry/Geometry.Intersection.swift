@@ -20,7 +20,7 @@ public extension Geometry {
       public let second: XY<T>?
     }
     
-    public let index = GlobalCounter.index
+    public let index = Counter.shapes.newIndex() // TODO: When deserializing shapes, make sure Counter.shapes current index is greater than all of these
     public var value: Value? = nil
     public let parameters: IntersectionParameters<T>
     public var children: [UnownedShape<T>] = []

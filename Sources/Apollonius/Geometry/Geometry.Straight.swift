@@ -74,7 +74,7 @@ public extension Geometry {
       public let tip: XY<T>
     }
     
-    public let index = GlobalCounter.index
+    public let index = Counter.shapes.newIndex()
     public var value: Value? = nil
     public let parameters: StraightParameters<T>
     public var children: [UnownedShape<T>] = []

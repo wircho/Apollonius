@@ -42,7 +42,7 @@ public extension Geometry {
   }
   
   final class Point<T: Real> {
-    public let index = GlobalCounter.index
+    public let index = Counter.shapes.newIndex()
     public var value: XY<T>? = nil
     public let parameters: PointParameters<T>
     public var children: [UnownedShape<T>] = []
