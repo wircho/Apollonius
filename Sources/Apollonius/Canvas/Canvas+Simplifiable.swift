@@ -90,10 +90,10 @@ extension Canvas: Simplifiable {
     let elements: [Element]
   }
   
-  func simplified(context: CanvasContext) -> Simplified {
+  func simplified() -> Simplified {
     return .init(elements: items.keys.map {
       key in
-      return .init(alias: key.alias, item: items.unsortedDictionary[key]!.simplified(context: context))
+      return .init(alias: key.alias, item: items.unsortedDictionary[key]!.simplified())
     })
   }
   
@@ -146,13 +146,13 @@ extension Canvas.Item: Simplifiable {
     }
   }
   
-  func simplified(context: CanvasContext) -> Simplified {
+  func simplified() -> Simplified {
     switch self {
-    case let .point(figure): return .init(point: figure.simplified(context: context))
-    case let .straight(figure): return .init(straight: figure.simplified(context: context))
-    case let .circular(figure): return .init(circular: figure.simplified(context: context))
-    case let .intersection(figure): return .init(intersection: figure.simplified(context: context))
-    case let .scalar(figure): return .init(scalar: figure.simplified(context: context))
+    case let .point(figure): return .init(point: figure.simplified())
+    case let .straight(figure): return .init(straight: figure.simplified())
+    case let .circular(figure): return .init(circular: figure.simplified())
+    case let .intersection(figure): return .init(intersection: figure.simplified())
+    case let .scalar(figure): return .init(scalar: figure.simplified())
     }
   }
   
@@ -182,8 +182,8 @@ extension Canvas.Figure: Simplifiable where S: ShapeInternal {
     let info: Info
   }
   
-  func simplified(context: CanvasContext) -> Simplified {
-    return .init(shape: shape.simplified(context: context), style: style, info: info)
+  func simplified() -> Simplified {
+    return .init(shape: shape.simplified(), style: style, info: info)
   }
   
   static func from(simplified: Simplified, context: CanvasContext) -> Canvas<T, Meta>.Figure<S, Style> {
@@ -215,7 +215,7 @@ extension Geometry.Intersection: Simplifiable {
     }
   }
   
-  func simplified(context: CanvasContext) -> Simplified {
+  func simplified() -> Simplified {
     switch parameters {
     case let ._straightCircular(straight, circular):
       return .init(straightCircular: .init(straight: straight.alias, circular: circular.alias))
@@ -250,7 +250,7 @@ extension Geometry.Scalar: Simplifiable {
     }
   }
   
-  func simplified(context: CanvasContext) -> Simplified {
+  func simplified() -> Simplified {
     switch parameters {
     case let ._distance(point0, point1):
       return .init(distance: .init(point0: point0.alias, point1: point1.alias))
@@ -300,7 +300,7 @@ extension Geometry.Circular: Simplifiable {
     }
   }
   
-  func simplified(context: CanvasContext) -> Simplified {
+  func simplified() -> Simplified {
     switch parameters {
     case let ._arc(point0, point1, point2):
       return .init(arc: .init(point0: point0.alias, point1: point1.alias, point2: point2.alias))
@@ -353,7 +353,7 @@ extension Geometry.Straight: Simplifiable {
     }
   }
   
-  func simplified(context: CanvasContext) -> Simplified {
+  func simplified() -> Simplified {
     switch parameters.definition {
     case let ._between(origin, tip):
       return .init(kind: parameters.kind, between: .init(origin: origin.alias, tip: tip.alias))
@@ -432,7 +432,7 @@ extension Geometry.Point: Simplifiable {
     }
   }
   
-  func simplified(context: CanvasContext) -> Simplified {
+  func simplified() -> Simplified {
     switch parameters {
     case let ._circumcenter(point0, point1, point2):
       return .init(circumcenter: .init(point0: point0.alias, point1: point1.alias, point2: point2.alias))

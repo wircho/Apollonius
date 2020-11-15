@@ -11,13 +11,12 @@ final class ApolloniusTests: XCTestCase {
         
     }
     
-    func testSegmentPointToPoint() {
+    func testCanvas() {
         
     }
 
     static var allTests = [
         ("testExample", testExample),
+        ("testCanvas", testCanvas)
     ]
 }
-
-// MARK: - Figure type tests
