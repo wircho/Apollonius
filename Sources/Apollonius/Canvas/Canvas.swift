@@ -1,3 +1,4 @@
+import Foundation
 import Numerics
 
 public protocol CanvasMetaProtocol {
@@ -8,7 +9,7 @@ public protocol CanvasMetaProtocol {
 }
 
 public protocol FigureProtocol {
-  associatedtype S: Shape
+  associatedtype S: GeometricShape
   associatedtype Style: FigureStyle
   associatedtype Info: FigureInfo
   var shape: S { get }
@@ -39,8 +40,8 @@ public final class Canvas<T: Real & Codable, Meta: CanvasMetaProtocol> {
   public typealias ScalarStyle = EmptyScalarStyle
   public typealias IntersectionStyle = EmptyIntersectionStyle
   
-  public let undoContext = UndoContext()
-  var items: SortedDictionary<ObjectIdentifier, Item> = [:]
+  public let undoManager = UndoManager()
+  var items: OrderedDictionary<ObjectIdentifier, Item> = [:]
   var pointHandles: Dictionary<ObjectIdentifier, PointHandle> = [:]
 }
 
@@ -59,12 +60,12 @@ public extension Canvas {
   }
   
   func update(from key: ObjectIdentifier) {
-    update(keys: gatherKeys(from: key, includeUpstreamIntersections: false))
+    update(keys: gatherKeys(from: key))
   }
 }
 
 public extension Canvas {
-  final class Figure<S: Shape, Style: FigureStyle>: FigureProtocol where S.T == T {
+  final class Figure<S: GeometricShape, Style: FigureStyle>: FigureProtocol where S.T == T {
     public let shape: S
     public var style: Style
     public var info: Info
@@ -115,7 +116,7 @@ extension Canvas.Item {
   }
 }
 
-extension Shape {
+extension GeometricShape {
   var key: ObjectIdentifier { return .init(self) }
 }
 

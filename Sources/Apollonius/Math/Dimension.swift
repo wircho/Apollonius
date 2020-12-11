@@ -1,1 +1,1 @@
-public protocol Dimension: Value {}
+public protocol Dimension: SimpleValue {}

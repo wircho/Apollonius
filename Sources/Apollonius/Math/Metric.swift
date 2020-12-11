@@ -1,6 +1,6 @@
 import Numerics
 
-public protocol Metric: Value {}
+public protocol Metric: SimpleValue {}
 
 public struct Multiplied<M0: Metric, M1: Metric>: Metric where M0.T == M1.T {
     public let value: M0.T
