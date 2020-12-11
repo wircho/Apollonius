@@ -6,7 +6,7 @@ public extension Geometry.Straight {
   }
 }
 
-public extension Geometry.Straight.Value {
+extension Geometry.Straight.Value {
   var vector: DXY<T> {
     return tip - origin
   }
@@ -20,7 +20,7 @@ public extension Geometry.Straight.Value {
   }
 }
 
-public extension Geometry.Straight {
+extension Geometry.Straight {
   var vector: DXY<T>? {
     return value?.vector
   }
@@ -44,7 +44,7 @@ public extension Geometry.Straight {
   }
 }
 
-public extension Geometry.Straight.Value {
+extension Geometry.Straight.Value {
   fileprivate func unrestrictedAbsoluteCursorValueAndNorm(near xy: XY<T>) -> (Length<T>, Length<T>)? {
     let vector = self.vector
     let xyVector = xy - origin
@@ -53,7 +53,7 @@ public extension Geometry.Straight.Value {
   }
 }
 
-public extension Geometry.Straight {
+extension Geometry.Straight {
   func normalizedCursorValue(near xy: XY<T>) -> T? {
     guard let (unrestricted, norm) = value?.unrestrictedAbsoluteCursorValueAndNorm(near: xy) else { return nil }
     switch parameters.kind {

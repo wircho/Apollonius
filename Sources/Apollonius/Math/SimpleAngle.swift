@@ -2,10 +2,10 @@ import Numerics
 
 public struct SimpleAngle<T: Real & Codable>: SimpleValue {
     public let value: T
-    public init(value: T) { self.value = value }
+    init(value: T) { self.value = value }
 }
 
-public extension SimpleAngle {
+extension SimpleAngle {
     var normalized: SimpleAngle {
         let twoPi = 2 * T.pi
         var value = self.value
@@ -25,7 +25,7 @@ public extension SimpleAngle {
     }
 }
 
-public extension Length {
+extension Length {
     func dxy(at angle: SimpleAngle<T>) -> DXY<T> {
         return angle.dxy(at: self)
     }
