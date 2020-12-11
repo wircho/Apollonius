@@ -6,7 +6,7 @@ public struct UnownedCurve<T: Real & Codable>: UnownedShapeConvertibleInternal {
   let _removeKnownPoint: (UnownedPoint<T>) -> Void
   func remove(knownPoint: UnownedPoint<T>) { _removeKnownPoint(knownPoint) }
   
-  init<C: GeometricCurve>(_ curve: C) where C.T == T {
+  init<C: GeometricCurveInternal>(_ curve: C) where C.T == T {
     asUnownedShape = .init(curve)
     _removeKnownPoint = { [weak curve] point in curve!.knownPoints.remove(point) }
   }

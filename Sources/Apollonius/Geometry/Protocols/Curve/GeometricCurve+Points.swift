@@ -1,4 +1,4 @@
-extension GeometricCurve {
+extension GeometricCurveInternal {
   func slideThrough(_ singlePoint: Geometry.Point<T>) {
     knownPoints.insert(.init(singlePoint))
     singlePoint.knownCurves.insert(.init(self))

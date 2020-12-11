@@ -1,6 +1,6 @@
 import Numerics
 
-extension Geometry.Straight: GeometricCurve, GeometricShapeInternal {
+extension Geometry.Straight: GeometricCurveInternal {
   public func newValue() -> Geometry.Straight<T>.Value? {
     switch parameters.definition {
     case let ._between(origin, tip):

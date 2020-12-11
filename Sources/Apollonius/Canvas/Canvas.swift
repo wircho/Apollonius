@@ -8,30 +8,6 @@ public protocol CanvasMetaProtocol {
   associatedtype CircularStyle: FigureStyle
 }
 
-public protocol FigureProtocol {
-  associatedtype S: GeometricShape
-  associatedtype Style: FigureStyle
-  associatedtype Info: FigureInfo
-  var shape: S { get }
-  init(_ shape: S, style: Style, info: Info)
-}
-
-public protocol FigureInfo: Codable {
-  init()
-}
-
-public protocol FigureStyle: Codable {
-  init()
-}
-
-public struct EmptyScalarStyle: FigureStyle {
-  public init() {}
-}
-
-public struct EmptyIntersectionStyle: FigureStyle {
-  public init() {}
-}
-
 public final class Canvas<T: Real & Codable, Meta: CanvasMetaProtocol> {
   public typealias Info = Meta.Info
   public typealias PointStyle = Meta.PointStyle
@@ -77,6 +53,8 @@ public extension Canvas {
     }
   }
 }
+
+extension Canvas.Figure: FigureProtocolInternal where S: GeometricShapeInternal {}
 
 public extension Canvas {
   enum Item {
