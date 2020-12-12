@@ -5,7 +5,7 @@ public extension Canvas {
 }
 
 public extension Canvas {
-  func distance(_ unsortedPoint0: Point, _ unsortedPoint1: Point, style: ScalarStyle = .init(), info: Info = .init()) -> Scalar {
+  func distance(_ unsortedPoint0: Point, _ unsortedPoint1: Point, style: ScalarStyle = .init(), meta: FigureMeta = .init()) -> Scalar {
     let (point0, point1) = Canvas.sorted(unsortedPoint0, unsortedPoint1)
     for child in commonChildren(point0, point1) {
       guard case let .scalar(scalar) = child else { continue }
@@ -15,7 +15,7 @@ public extension Canvas {
     }
     // Creating shape
     let shape = Geometry.Scalar.distance(point0.shape, point1.shape)
-    let scalar = Scalar(shape, style: style, info: info)
+    let scalar = Scalar(shape, style: style, meta: meta)
     add(scalar)
     return scalar
   }

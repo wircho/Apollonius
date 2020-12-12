@@ -5,7 +5,7 @@ public extension Canvas {
 }
 
 public extension Canvas {
-  func circle(centeredAt center: Point, through tip: Point, style: CircularStyle = .init(), info: Info = .init()) -> Circular {
+  func circle(centeredAt center: Point, through tip: Point, style: CircularStyle = .init(), meta: FigureMeta = .init()) -> Circular {
     for item in commonChildren(center, tip) {
       guard case let .circular(circular) = item else { continue }
       guard case let ._between(otherCenter, otherArm) = circular.shape.parameters else { continue }
@@ -14,12 +14,12 @@ public extension Canvas {
     }
     // Creating shape
     let shape = Geometry.Circular.centered(at: center.shape, through: tip.shape)
-    let circular = Circular(shape, style: style, info: info)
+    let circular = Circular(shape, style: style, meta: meta)
     add(circular)
     return circular
   }
   
-  func circle(centeredAt center: Point, radius: Scalar, style: CircularStyle = .init(), info: Info = .init()) -> Circular {
+  func circle(centeredAt center: Point, radius: Scalar, style: CircularStyle = .init(), meta: FigureMeta = .init()) -> Circular {
     for item in commonChildren(center, radius) {
       guard case let .circular(circular) = item else { continue }
       guard case let ._with(otherCenter, otherRadius) = circular.shape.parameters else { continue }
@@ -28,12 +28,12 @@ public extension Canvas {
     }
     // Creating shape
     let shape = Geometry.Circular.centered(at: center.shape, radius: radius.shape)
-    let circular = Circular(shape, style: style, info: info)
+    let circular = Circular(shape, style: style, meta: meta)
     add(circular)
     return circular
   }
   
-  func circumcircle(_ unsortedPoint0: Point, _ unsortedPoint1: Point, _ unsortedPoint2: Point, style: CircularStyle = .init(), info: Info = .init()) -> Circular {
+  func circumcircle(_ unsortedPoint0: Point, _ unsortedPoint1: Point, _ unsortedPoint2: Point, style: CircularStyle = .init(), meta: FigureMeta = .init()) -> Circular {
     let (point0, point1, point2) = Canvas.sorted(unsortedPoint0, unsortedPoint1, unsortedPoint2)
     for item in commonKnownCurves(point0, point1, point2) {
       guard case let .circular(circular) = item else { continue }
@@ -41,12 +41,12 @@ public extension Canvas {
     }
     // Creating shape
     let shape = Geometry.Circular.circumscribing(point0.shape, point1.shape, point2.shape)
-    let circular = Circular(shape, style: style, info: info)
+    let circular = Circular(shape, style: style, meta: meta)
     add(circular)
     return circular
   }
   
-  func arcCircumscribing(_ point0: Point, _ point1: Point, _ point2: Point, style: CircularStyle = .init(), info: Info = .init()) -> Circular {
+  func arcCircumscribing(_ point0: Point, _ point1: Point, _ point2: Point, style: CircularStyle = .init(), meta: FigureMeta = .init()) -> Circular {
     for item in commonKnownCurves(point0, point1, point2) {
       guard case let .circular(circular) = item else { continue }
       guard case let ._arc(otherPoint0, otherPoint1, otherPoint2) = circular.shape.parameters else { continue }
@@ -55,7 +55,7 @@ public extension Canvas {
     }
     // Creating shape
     let shape = Geometry.Circular.arcCircumscribing(point0.shape, point1.shape, point2.shape)
-    let circular = Circular(shape, style: style, info: info)
+    let circular = Circular(shape, style: style, meta: meta)
     add(circular)
     return circular
   }

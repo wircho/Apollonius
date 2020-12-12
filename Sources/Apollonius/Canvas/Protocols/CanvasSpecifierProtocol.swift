@@ -1,6 +1,7 @@
-public protocol CanvasMetaProtocol {
-  associatedtype Info: FigureInfo
+public protocol CanvasSpecifierProtocol {
+  associatedtype FigureMeta: FigureMetaProtocol
   associatedtype PointStyle: FigureStyle
   associatedtype StraightStyle: FigureStyle
   associatedtype CircularStyle: FigureStyle
 }
+

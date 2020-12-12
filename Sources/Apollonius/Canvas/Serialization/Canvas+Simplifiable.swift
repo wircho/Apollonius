@@ -105,7 +105,7 @@ extension Canvas: Simplifiable {
   }
   
   static func from(simplified: Simplified, context: CanvasContext) -> Canvas {
-    let canvas = Canvas()
+    let canvas = Canvas(.generic)
     for element in simplified.elements {
       let item = Canvas.Item.from(simplified: element.item, context: context)
       switch item {
@@ -180,15 +180,15 @@ extension Canvas.Figure: Simplifiable where S: GeometricShapeInternal {
   struct Simplified {
     let shape: S.Simplified
     let style: Style
-    let info: Canvas.Info
+    let meta: Canvas.FigureMeta
   }
   
   func simplified() -> Simplified {
-    return .init(shape: shape.simplified(), style: style, info: info)
+    return .init(shape: shape.simplified(), style: style, meta: meta)
   }
   
-  static func from(simplified: Simplified, context: CanvasContext) -> Canvas<T, Meta>.Figure<S, Style> {
-    return .init(.from(simplified: simplified.shape, context: context), style: simplified.style, info: simplified.info)
+  static func from(simplified: Simplified, context: CanvasContext) -> Canvas<T, Specifier>.Figure<S, Style> {
+    return .init(.from(simplified: simplified.shape, context: context), style: simplified.style, meta: simplified.meta)
   }
 }
 

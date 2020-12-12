@@ -5,19 +5,19 @@ public extension Canvas {
 }
 
 public extension Canvas {
-  func point(at x: T, _ y: T, style: PointStyle = .init(), info: Info = .init()) -> Point {
+  func point(at x: T, _ y: T, style: PointStyle = .init(), meta: FigureMeta = .init()) -> Point {
     let xy = XY(x: .init(value: x), y: .init(value: y))
     let shape = Geometry.Point.fixed(position: xy)
-    let point = Point(shape, style: style, info: info)
+    let point = Point(shape, style: style, meta: meta)
     add(point)
     return point
   }
   
-  func pointHandle(at x: T, _ y: T, style: PointStyle = .init(), info: Info = .init()) -> PointHandle {
+  func pointHandle(at x: T, _ y: T, style: PointStyle = .init(), meta: FigureMeta = .init()) -> PointHandle {
     let xy = XY(x: .init(value: x), y: .init(value: y))
     let cursor = Geometry.Cursor(xy)
     let shape = Geometry.Point.free(cursor: cursor)
-    let point = Point(shape, style: style, info: info)
+    let point = Point(shape, style: style, meta: meta)
     let handle = PointHandle(point: point, cursor: cursor, canvas: self) { $0 }
     undoManager.beginUndoGrouping()
     add(handle)
@@ -26,12 +26,12 @@ public extension Canvas {
     return handle
   }
   
-  func pointHandle(on circular: Circular, near x: T, _ y: T, style: PointStyle = .init(), info: Info = .init()) -> PointHandle {
+  func pointHandle(on circular: Circular, near x: T, _ y: T, style: PointStyle = .init(), meta: FigureMeta = .init()) -> PointHandle {
     let xy = XY(x: .init(value: x), y: .init(value: y))
     let angle = circular.shape.cursorValue(near: xy) ?? .init(value: 0)
     let cursor = Geometry.Cursor(angle)
     let shape = Geometry.Point.on(circular.shape, cursor: cursor)
-    let point = Point(shape, style: style, info: info)
+    let point = Point(shape, style: style, meta: meta)
     let handle = PointHandle(point: point, cursor: cursor, canvas: self) { [weak circular] xy in
       return circular?.shape.cursorValue(near: xy) ?? .init(value: 0)
     }
@@ -42,14 +42,14 @@ public extension Canvas {
     return handle
   }
   
-  func pointHandle(on straight: Straight, near x: T, _ y: T, style: PointStyle = .init(), info: Info = .init()) -> PointHandle {
+  func pointHandle(on straight: Straight, near x: T, _ y: T, style: PointStyle = .init(), meta: FigureMeta = .init()) -> PointHandle {
     let xy = XY(x: .init(value: x), y: .init(value: y))
     switch straight.shape.parameters.kind {
     case .segment:
       let normalizedValue = straight.shape.normalizedCursorValue(near: xy) ?? 1/2
       let cursor = Geometry.Cursor(normalizedValue)
       let shape = Geometry.Point.on(straight.shape, cursor: cursor)
-      let point = Point(shape, style: style, info: info)
+      let point = Point(shape, style: style, meta: meta)
       let handle = PointHandle(point: point, cursor: cursor, canvas: self) { [weak straight] xy in
         return straight?.shape.normalizedCursorValue(near: xy) ?? 1/2
       }
@@ -62,7 +62,7 @@ public extension Canvas {
       let absoluteValue = straight.shape.absoluteCursorValue(near: xy) ?? .init(value: 0)
       let cursor = Geometry.Cursor(absoluteValue)
       let shape = Geometry.Point.on(straight.shape, cursor: cursor)
-      let point = Point(shape, style: style, info: info)
+      let point = Point(shape, style: style, meta: meta)
       let handle = PointHandle(point: point, cursor: cursor, canvas: self) { [weak straight] xy in
         return straight?.shape.absoluteCursorValue(near: xy) ?? .init(value: 0)
       }
@@ -74,7 +74,7 @@ public extension Canvas {
     }
   }
   
-  func circumcenter(_ unsortedPoint0: Point, _ unsortedPoint1: Point, _ unsortedPoint2: Point, style: PointStyle = .init(), info: Info = .init()) -> Point {
+  func circumcenter(_ unsortedPoint0: Point, _ unsortedPoint1: Point, _ unsortedPoint2: Point, style: PointStyle = .init(), meta: FigureMeta = .init()) -> Point {
     let (point0, point1, point2) = Canvas.sorted(unsortedPoint0, unsortedPoint1, unsortedPoint2)
     for child in commonChildren(point0, point1, point2) {
       guard case let .point(point) = child else { continue }
@@ -84,17 +84,17 @@ public extension Canvas {
     }
     // Creating shape
     let shape = Geometry.Point.circumcenter(point0.shape, point1.shape, point2.shape)
-    let point = Point(shape, style: style, info: info)
+    let point = Point(shape, style: style, meta: meta)
     add(point)
     return point
   }
   
-  func intersection(_ unsortedStraight0: Straight, _ unsortedStraight1: Straight, style: PointStyle = .init(), info: Info = .init()) -> Point {
+  func intersection(_ unsortedStraight0: Straight, _ unsortedStraight1: Straight, style: PointStyle = .init(), meta: FigureMeta = .init()) -> Point {
     let (straight0, straight1) = Canvas.sorted(unsortedStraight0, unsortedStraight1)
     for child in commonKnownPoints(straight0, straight1) { return child }
     // Creating shape
     let shape = Geometry.Point.intersection(straight0.shape, straight1.shape)
-    let point = Point(shape, style: style, info: info)
+    let point = Point(shape, style: style, meta: meta)
     add(point)
     return point
   }
@@ -136,7 +136,7 @@ public extension Canvas {
     }
   }
   
-  private func intersections(_ pair: CurvePair, style: PointStyle, info: Info, includeExistingPoints: Bool, condition: ((XY<T>?) -> Bool)?) -> [Point] {
+  private func intersections(_ pair: CurvePair, style: PointStyle, meta: FigureMeta, includeExistingPoints: Bool, condition: ((XY<T>?) -> Bool)?) -> [Point] {
     let knownPoints = commonKnownPoints(pair)
     switch knownPoints.count {
     case 0:
@@ -145,7 +145,7 @@ public extension Canvas {
       if condition != nil { intersection.shape.update() }
       let candidateIndices = [.first, .second].filter { satisfies(condition, intersection.shape.value?[$0]) }
       let shapes = candidateIndices.map{ Geometry.Point.intersection(intersection.shape, index: $0) }
-      let points = shapes.map{ Point($0, style: style, info: info) }
+      let points = shapes.map{ Point($0, style: style, meta: meta) }
       undoManager.beginUndoGrouping()
       if shapes.count > 0 { add(fragileIntersection: intersection) }
       for i in 0 ..< shapes.count { add(points[i]) }
@@ -163,7 +163,7 @@ public extension Canvas {
         let newPointSatisfiesCondition = satisfies(condition, intersection.shape.value?.opposite(to: knownPoint.shape.value))
         guard newPointSatisfiesCondition else { return knownPointSatisfiesCondition ? [knownPoint] : [] }
         let shape = Geometry.Point.oppositeIntersection(intersection.shape, from: knownPoint.shape)
-        let point = Point(shape, style: style, info: info)
+        let point = Point(shape, style: style, meta: meta)
         undoManager.beginUndoGrouping()
         add(fragileIntersection: intersection)
         add(point)
@@ -183,7 +183,7 @@ public extension Canvas {
       }
       // New point satisfies condition. Creating...
       let shape = Geometry.Point.intersection(intersection.inner.object, index: index)
-      let point = Point(shape, style: style, info: info)
+      let point = Point(shape, style: style, meta: meta)
       add(point)
       return knownPointSatisfiesCondition ? [knownPoint, point] : [point]
     default:
@@ -192,12 +192,12 @@ public extension Canvas {
     }
   }
   
-  func intersections(_ straight: Straight, _ circular: Circular, style: PointStyle = .init(), info: Info = .init(), includeExistingPoints: Bool = true, condition: ((XY<T>?) -> Bool)? = nil) -> [Point] {
-    return intersections(.straightCircular(straight, circular), style: style, info: info, includeExistingPoints: includeExistingPoints, condition: condition)
+  func intersections(_ straight: Straight, _ circular: Circular, style: PointStyle = .init(), meta: FigureMeta = .init(), includeExistingPoints: Bool = true, condition: ((XY<T>?) -> Bool)? = nil) -> [Point] {
+    return intersections(.straightCircular(straight, circular), style: style, meta: meta, includeExistingPoints: includeExistingPoints, condition: condition)
   }
   
-  func intersections(_ unsortedCircular0: Circular, _ unsortedCircular1: Circular, style: PointStyle = .init(), info: Info = .init(), includeExistingPoints: Bool = true, condition: ((XY<T>?) -> Bool)? = nil) -> [Point] {
+  func intersections(_ unsortedCircular0: Circular, _ unsortedCircular1: Circular, style: PointStyle = .init(), meta: FigureMeta = .init(), includeExistingPoints: Bool = true, condition: ((XY<T>?) -> Bool)? = nil) -> [Point] {
     let (circular0, circular1) = Canvas.sorted(unsortedCircular0, unsortedCircular1)
-    return intersections(.twoCirculars(circular0, circular1), style: style, info: info, includeExistingPoints: includeExistingPoints, condition: condition)
+    return intersections(.twoCirculars(circular0, circular1), style: style, meta: meta, includeExistingPoints: includeExistingPoints, condition: condition)
   }
 }

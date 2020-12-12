@@ -1,15 +1,25 @@
 import Foundation
 import Numerics
 
-public final class Canvas<T: Real & Codable, Meta: CanvasMetaProtocol> {
-  public typealias Info = Meta.Info
-  public typealias PointStyle = Meta.PointStyle
-  public typealias StraightStyle = Meta.StraightStyle
-  public typealias CircularStyle = Meta.CircularStyle
-  public typealias ScalarStyle = EmptyScalarStyle
-  typealias IntersectionStyle = EmptyIntersectionStyle
+public final class Canvas<T: Real & Codable, Specifier: CanvasSpecifierProtocol> {
+  public typealias FigureMeta = Specifier.FigureMeta
+  public typealias PointStyle = Specifier.PointStyle
+  public typealias StraightStyle = Specifier.StraightStyle
+  public typealias CircularStyle = Specifier.CircularStyle
+  public typealias ScalarStyle = EmptyStyle
+  typealias IntersectionStyle = EmptyStyle
   
-  public let undoManager = UndoManager()
+  let undoManager = UndoManager()
   var items: OrderedDictionary<ObjectIdentifier, Item> = [:]
   var pointHandles: Dictionary<ObjectIdentifier, PointHandle> = [:]
+  
+  enum DesignatedParameter { case generic }
+  
+  init(_ parameter: DesignatedParameter) {
+    undoManager.levelsOfUndo = 1
+  }
+}
+
+public extension Canvas where T == Double, Specifier == DefaultCanvasSpecifier {
+  convenience init() { self.init(.generic) }
 }
