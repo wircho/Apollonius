@@ -1,6 +1,6 @@
 import Foundation
 
-extension Canvas {
+public extension Canvas {
   func toJSON() throws -> Data {
     let encoder = JSONEncoder()
     encoder.outputFormatting = .prettyPrinted

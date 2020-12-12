@@ -5,3 +5,7 @@ public protocol GeometricShape: AnyObject {
   associatedtype Value
   var value: Value? { get }
 }
+
+extension GeometricShape {
+  var key: ObjectIdentifier { return .init(self) }
+}

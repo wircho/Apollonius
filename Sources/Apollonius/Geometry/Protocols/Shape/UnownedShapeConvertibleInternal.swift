@@ -5,6 +5,10 @@ protocol UnownedShapeConvertibleInternal: UnownedShapeConvertible {
   var inner: Unowned<ObjectType> { get }
 }
 
+extension UnownedShapeConvertibleInternal {
+  var key: ObjectIdentifier { return .init(inner.object) }
+}
+
 func ==<S0: GeometricShape, S1: UnownedShapeConvertibleInternal>(lhs: S0, rhs: S1) -> Bool where S1.ObjectType == S0, S0.T == S1.T {
   return lhs === rhs.asUnownedShape.inner.object
 }
