@@ -1,7 +1,7 @@
 import Numerics
 
 extension Geometry.Circular: GeometricCurveInternal {
-  public func newValue() -> Geometry.Circular<T>.Value? {
+  func newValue() -> Geometry.Circular<T>.Value? {
     switch parameters {
     case let ._between(center, tip):
       guard let center = center.inner.object.value, let tip = tip.inner.object.value else { return nil }

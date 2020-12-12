@@ -1,6 +1,6 @@
 import Numerics
 
-public extension Geometry.Intersection {
+extension Geometry.Intersection {
   static func between(_ straight: Geometry.Straight<T>, _ circular: Geometry.Circular<T>) -> Geometry.Intersection<T> {
     return .init(.between(straight, circular))
   }

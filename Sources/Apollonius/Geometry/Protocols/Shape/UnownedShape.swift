@@ -1,16 +1,16 @@
 import Numerics
 
-public struct UnownedShape<T: Real & Codable> {
+struct UnownedShape<T: Real & Codable> {
   let _children: () -> Set<UnownedShape<T>>
   let _removeChild: (UnownedShape<T>) -> Void
   let _removeParent: (UnownedShape<T>) -> Void
   let _update: () -> Void
   let inner: Unowned<AnyObject>
   
-  public var children: Set<UnownedShape<T>> { return _children() }
-  public func remove(child: UnownedShape<T>) { _removeChild(child) }
-  public func remove(parent: UnownedShape<T>) { _removeParent(parent) }
-  public func update() { _update() }
+  var children: Set<UnownedShape<T>> { return _children() }
+  func remove(child: UnownedShape<T>) { _removeChild(child) }
+  func remove(parent: UnownedShape<T>) { _removeParent(parent) }
+  func update() { _update() }
   
   init<S: GeometricShapeInternal>(_ shape: S) where S.T == T {
     self.inner = .init(shape)
@@ -22,7 +22,7 @@ public struct UnownedShape<T: Real & Codable> {
 }
 
 extension UnownedShape: Hashable {
-  public func hash(into hasher: inout Hasher) {
+  func hash(into hasher: inout Hasher) {
     inner.identifier.hash(into: &hasher)
   }
 }

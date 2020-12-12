@@ -41,25 +41,6 @@ public extension Canvas {
       recordStateAndRegisterUndoIfNeeded()
     }
     
-    public func beginSmoothMove() {
-      guard !isMovingSmoothly && canvas?.undoManager.isUndoRegistrationEnabled ?? true else { return }
-      isMovingSmoothly = true
-      canvas?.undoManager.disableUndoRegistration()
-      dependantKeys = canvas?.gatherKeys(from: self.point.shape.key)
-    }
-    
-    public func endSmoothMove() {
-      guard isMovingSmoothly else { return }
-      isMovingSmoothly = false
-      canvas?.undoManager.enableUndoRegistration()
-      dependantKeys = nil
-      recordStateAndRegisterUndoIfNeeded()
-    }
-    
-    public func move(to x: T, _ y: T) {
-      move(to: .init(x: .init(value: x), y: .init(value: y)))
-    }
-    
     func recordStateAndRegisterUndoIfNeeded() {
       guard !isMovingSmoothly else { return }
       
@@ -88,5 +69,26 @@ public extension Canvas {
       }
       latestState = getCurrentState()
     }
+  }
+}
+
+public extension Canvas.PointHandle {
+  func beginSmoothMove() {
+    guard !isMovingSmoothly && canvas?.undoManager.isUndoRegistrationEnabled ?? true else { return }
+    isMovingSmoothly = true
+    canvas?.undoManager.disableUndoRegistration()
+    dependantKeys = canvas?.gatherKeys(from: self.point.shape.key)
+  }
+  
+  func endSmoothMove() {
+    guard isMovingSmoothly else { return }
+    isMovingSmoothly = false
+    canvas?.undoManager.enableUndoRegistration()
+    dependantKeys = nil
+    recordStateAndRegisterUndoIfNeeded()
+  }
+  
+  func move(to x: T, _ y: T) {
+    move(to: .init(x: .init(value: x), y: .init(value: y)))
   }
 }

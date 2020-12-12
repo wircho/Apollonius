@@ -3,14 +3,15 @@ import Numerics
 public extension Geometry {
   
   final class Point<T: Real & Codable> {
-    public let index = Counter.shapes.newIndex()
-    public var value: XY<T>? = nil
-    public let parameters: PointParameters<T>
-    public var children: Set<UnownedShape<T>> = []
-    public var parents: Set<UnownedShape<T>> = []
-    public var knownCurves: Set<UnownedCurve<T>> = []
+    public internal(set) var value: XY<T>? = nil
     
-    public init(_ parameters: PointParameters<T>) {
+    let index = Counter.shapes.newIndex()
+    let parameters: PointParameters<T>
+    var children: Set<UnownedShape<T>> = []
+    var parents: Set<UnownedShape<T>> = []
+    var knownCurves: Set<UnownedCurve<T>> = []
+    
+    init(_ parameters: PointParameters<T>) {
       self.parameters = parameters
       self.update()
       switch parameters {

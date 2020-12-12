@@ -7,15 +7,15 @@ public extension Geometry {
       public let radius: Length<T>
       public let interval: AngleInterval<T>?
     }
+    public internal(set) var value: Value? = nil
     
-    public let index = Counter.shapes.newIndex()
-    public var value: Value? = nil
-    public let parameters: CircularParameters<T>
-    public var children: Set<UnownedShape<T>> = []
-    public var parents: Set<UnownedShape<T>> = []
-    public var knownPoints: Set<UnownedPoint<T>> = []
+    let index = Counter.shapes.newIndex()
+    let parameters: CircularParameters<T>
+    var children: Set<UnownedShape<T>> = []
+    var parents: Set<UnownedShape<T>> = []
+    var knownPoints: Set<UnownedPoint<T>> = []
     
-    public init(_ parameters: CircularParameters<T>) {
+    init(_ parameters: CircularParameters<T>) {
       self.parameters = parameters
       self.update()
       switch parameters {

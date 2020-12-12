@@ -1,7 +1,7 @@
 import Numerics
 
-public struct UnownedCurve<T: Real & Codable>: UnownedShapeConvertibleInternal {
-  public let asUnownedShape: UnownedShape<T>
+struct UnownedCurve<T: Real & Codable>: UnownedShapeConvertibleInternal {
+  let asUnownedShape: UnownedShape<T>
   var inner: Unowned<AnyObject> { return asUnownedShape.inner }
   let _removeKnownPoint: (UnownedPoint<T>) -> Void
   func remove(knownPoint: UnownedPoint<T>) { _removeKnownPoint(knownPoint) }
@@ -13,7 +13,7 @@ public struct UnownedCurve<T: Real & Codable>: UnownedShapeConvertibleInternal {
 }
 
 extension UnownedCurve: Hashable {
-  public func hash(into hasher: inout Hasher) {
+  func hash(into hasher: inout Hasher) {
     inner.identifier.hash(into: &hasher)
   }
 }

@@ -2,7 +2,8 @@
 public protocol FigureProtocol {
   associatedtype S: GeometricShape
   associatedtype Style: FigureStyle
-  associatedtype Info: FigureInfo
+  associatedtype Info
   var shape: S { get }
-  init(_ shape: S, style: Style, info: Info)
+  var style: Style { get set }
+  var info: Info { get set }
 }

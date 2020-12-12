@@ -1,12 +1,12 @@
 
 extension Geometry.Intersection {
-  public struct Value {
-    public let first: XY<T>?
-    public let second: XY<T>?
+  struct Value {
+    let first: XY<T>?
+    let second: XY<T>?
   }
 }
 
-public extension Geometry.Intersection.Value {
+extension Geometry.Intersection.Value {
   subscript(_ index: Geometry.IntersectionIndex) -> XY<T>? {
     switch index {
     case .first: return first
@@ -25,7 +25,7 @@ public extension Geometry.Intersection.Value {
   }
 }
 
-public extension Geometry.Intersection {
+extension Geometry.Intersection {
   subscript(_ index: Geometry.IntersectionIndex) -> XY<T>? {
     return value?[index]
   }

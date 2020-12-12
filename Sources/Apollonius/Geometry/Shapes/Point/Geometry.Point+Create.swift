@@ -1,6 +1,6 @@
 import Numerics
 
-public extension Geometry.Point {
+extension Geometry.Point {
   static func fixed(position: XY<T>) -> Geometry.Point<T> {
     return .init(.fixed(position: position))
   }

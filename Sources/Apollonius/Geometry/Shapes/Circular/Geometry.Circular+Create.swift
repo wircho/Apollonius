@@ -1,6 +1,6 @@
 import Numerics
 
-public extension Geometry.Circular {
+extension Geometry.Circular {
   static func centered(at center: Geometry.Point<T>, through tip: Geometry.Point<T>) -> Geometry.Circular<T> {
     return .init(.between(center: center, tip: tip))
   }

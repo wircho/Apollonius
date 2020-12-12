@@ -3,13 +3,14 @@ import Numerics
 public extension Geometry {
   
   final class Scalar<T: Real & Codable> {
-    public let index = Counter.shapes.newIndex()
-    public var value: Length<T>? = nil
-    public let parameters: ScalarParameters<T>
-    public var children: Set<UnownedShape<T>> = []
-    public var parents: Set<UnownedShape<T>> = []
+    public internal(set) var value: Length<T>? = nil
     
-    public init(_ parameters: ScalarParameters<T>) {
+    let index = Counter.shapes.newIndex()
+    let parameters: ScalarParameters<T>
+    var children: Set<UnownedShape<T>> = []
+    var parents: Set<UnownedShape<T>> = []
+    
+    init(_ parameters: ScalarParameters<T>) {
       self.parameters = parameters
       self.update()
       switch parameters {

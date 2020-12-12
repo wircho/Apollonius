@@ -3,15 +3,15 @@ import Numerics
 public extension Geometry {
   
   final class Straight<T: Real & Codable> {
+    public internal(set) var value: Value? = nil
     
-    public let index = Counter.shapes.newIndex()
-    public var value: Value? = nil
-    public let parameters: StraightParameters<T>
-    public var children: Set<UnownedShape<T>> = []
-    public var parents: Set<UnownedShape<T>> = []
-    public var knownPoints: Set<UnownedPoint<T>> = []
+    let index = Counter.shapes.newIndex()
+    let parameters: StraightParameters<T>
+    var children: Set<UnownedShape<T>> = []
+    var parents: Set<UnownedShape<T>> = []
+    var knownPoints: Set<UnownedPoint<T>> = []
     
-    public init(_ parameters: StraightParameters<T>) {
+    init(_ parameters: StraightParameters<T>) {
       self.parameters = parameters
       self.update()
       switch parameters.definition {

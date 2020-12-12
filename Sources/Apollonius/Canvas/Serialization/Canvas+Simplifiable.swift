@@ -180,7 +180,7 @@ extension Canvas.Figure: Simplifiable where S: GeometricShapeInternal {
   struct Simplified {
     let shape: S.Simplified
     let style: Style
-    let info: Info
+    let info: Canvas.Info
   }
   
   func simplified() -> Simplified {

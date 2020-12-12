@@ -1,8 +1,8 @@
 import Numerics
 
-public struct UnownedPoint<T: Real & Codable>: UnownedShapeConvertibleInternal {
+struct UnownedPoint<T: Real & Codable>: UnownedShapeConvertibleInternal {
   let inner: Unowned<Geometry.Point<T>>
-  public let asUnownedShape: UnownedShape<T>
+  let asUnownedShape: UnownedShape<T>
   
   let _removeKnownCurve: (UnownedCurve<T>) -> Void
   
@@ -16,7 +16,7 @@ public struct UnownedPoint<T: Real & Codable>: UnownedShapeConvertibleInternal {
 }
 
 extension UnownedPoint: Hashable {
-  public func hash(into hasher: inout Hasher) {
+  func hash(into hasher: inout Hasher) {
     inner.identifier.hash(into: &hasher)
   }
 }

@@ -2,11 +2,11 @@ import XCTest
 @testable import Apollonius
 import Numerics
 
-public enum StandardCanvasMeta: CanvasMetaProtocol {
-  public struct Info: FigureInfo { public init() {} }
-  public struct PointStyle: FigureStyle { public init() {} }
-  public struct StraightStyle: FigureStyle { public init() {} }
-  public struct CircularStyle: FigureStyle { public init() {} }
+enum StandardCanvasMeta: CanvasMetaProtocol {
+  struct Info: FigureInfo { init() {} }
+  struct PointStyle: FigureStyle { init() {} }
+  struct StraightStyle: FigureStyle { init() {} }
+  struct CircularStyle: FigureStyle { init() {} }
 }
 
 typealias StandardCanvas<T: Real & Codable> = Canvas<T, StandardCanvasMeta>

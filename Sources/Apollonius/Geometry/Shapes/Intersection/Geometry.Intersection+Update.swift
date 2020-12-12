@@ -1,7 +1,7 @@
 import Numerics
 
 extension Geometry.Intersection: GeometricShapeInternal {
-  public func newValue() -> Value? {
+  func newValue() -> Value? {
     switch parameters {
     case let ._straightCircular(straight, circular): return intersections(between: straight.inner.object, and: circular.inner.object)
     case let ._twoCirculars(circular0, circular1): return intersections(between: circular0.inner.object, and: circular1.inner.object)

@@ -1,7 +1,7 @@
 import Numerics
 
 extension Geometry.Point: GeometricShapeInternal {
-  public func newValue() -> XY<T>? {
+  func newValue() -> XY<T>? {
     switch parameters {
     case let .fixed(position):
       return position

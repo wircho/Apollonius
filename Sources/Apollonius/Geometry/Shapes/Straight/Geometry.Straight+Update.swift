@@ -1,7 +1,7 @@
 import Numerics
 
 extension Geometry.Straight: GeometricCurveInternal {
-  public func newValue() -> Geometry.Straight<T>.Value? {
+  func newValue() -> Geometry.Straight<T>.Value? {
     switch parameters.definition {
     case let ._between(origin, tip):
       guard let xy0 = origin.inner.object.value, let xy1 = tip.inner.object.value else { return nil }

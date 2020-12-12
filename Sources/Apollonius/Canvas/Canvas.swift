@@ -14,14 +14,14 @@ public final class Canvas<T: Real & Codable, Meta: CanvasMetaProtocol> {
   public typealias StraightStyle = Meta.StraightStyle
   public typealias CircularStyle = Meta.CircularStyle
   public typealias ScalarStyle = EmptyScalarStyle
-  public typealias IntersectionStyle = EmptyIntersectionStyle
+  typealias IntersectionStyle = EmptyIntersectionStyle
   
   public let undoManager = UndoManager()
   var items: OrderedDictionary<ObjectIdentifier, Item> = [:]
   var pointHandles: Dictionary<ObjectIdentifier, PointHandle> = [:]
 }
 
-public extension Canvas {
+extension Canvas {
   func update() {
     for key in items.keys {
       items[key]?.update()
@@ -42,11 +42,13 @@ public extension Canvas {
 
 public extension Canvas {
   final class Figure<S: GeometricShape, Style: FigureStyle>: FigureProtocol where S.T == T {
+    public typealias Info = Canvas.Info
+    
     public let shape: S
     public var style: Style
     public var info: Info
     
-    public init(_ shape: S, style: Style = .init(), info: Info = .init()) {
+    init(_ shape: S, style: Style = .init(), info: Info = .init()) {
       self.shape = shape
       self.style = style
       self.info = info
@@ -56,7 +58,7 @@ public extension Canvas {
 
 extension Canvas.Figure: FigureProtocolInternal where S: GeometricShapeInternal {}
 
-public extension Canvas {
+extension Canvas {
   enum Item {
     case point(Point)
     case straight(Straight)

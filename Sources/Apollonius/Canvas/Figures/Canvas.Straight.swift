@@ -43,7 +43,7 @@ public extension Canvas {
     return straight(.ray, origin, tip, style: style, info: info)
   }
   
-  func directedLine(_ direction: Geometry.StraightDirection, from origin: Point, to other: Straight, style: StraightStyle = .init(), info: Info = .init()) -> Straight {
+  private func directedLine(_ direction: Geometry.StraightDirection, from origin: Point, to other: Straight, style: StraightStyle = .init(), info: Info = .init()) -> Straight {
     for child in commonChildren(origin, other) {
       guard case let .straight(straight) = child else { continue }
       guard straight.shape.parameters.kind == .line else { continue }

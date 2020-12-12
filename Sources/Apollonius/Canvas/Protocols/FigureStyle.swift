@@ -7,6 +7,6 @@ public struct EmptyScalarStyle: FigureStyle {
   public init() {}
 }
 
-public struct EmptyIntersectionStyle: FigureStyle {
-  public init() {}
+struct EmptyIntersectionStyle: FigureStyle {
+  init() {}
 }

@@ -1,6 +1,6 @@
 import Numerics
 
-public extension Canvas {
+extension Canvas {
   typealias Intersection = Figure<Geometry.Intersection<T>, IntersectionStyle>
 }
 
