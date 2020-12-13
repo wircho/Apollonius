@@ -2,7 +2,7 @@
 
 Apollonius is a simple Euclidean geometry library for Swift that allows you to define figures on a 2D plane and computes for you things like circle radii and intersection point coordinates.
 
-## What Can You Do With This Package?
+## Usage
 
 With Apollonius you **can** initialize a `Canvas` object, representing a 2D coordinate system, and create figures such as points, lines, and circles that live on this `Canvas` instance. Each new geometric figure may depend on previous figures. For example:
 
@@ -16,9 +16,9 @@ print(circle.radius!) // 5.0
 print(line.slopeAngle!) // 0.9272952180016122
 ```
 
-## What Can You **Not** Do With This Package?
+### What Can You **Not** Do With This Package?
 
-With Apollonius alone you **cannot** draw or visually with interact the figures you create. A package that will allow you to do this, ApolloniusUI, is on its way. Feel free to you could create your own package as well.
+With Apollonius alone you **cannot** draw or visually with interact the figures you create. A package that will allow you to do this, ApolloniusUI, is on its way. Feel free to create your own package as well.
 
 ## Advanced Functionality
 
