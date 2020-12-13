@@ -4,7 +4,7 @@ Apollonius is a simple open source Euclidean geometry library in Swift that allo
 
 ## Usage
 
-With Apollonius you can initialize a `Canvas` object, representing a 2D coordinate system, and create figures such as points, lines, and circles that live in this `Canvas` instance. Each new geometric figure may depend on previous figures. For example:
+With Apollonius you can initialize a `Canvas` object, representing a 2D coordinate system, and create *figures* such as points, lines, and circles that live in this `Canvas` instance. Each new geometric figure may depend on previous figures. For example:
 
 ```swift
 let canvas = Canvas()
