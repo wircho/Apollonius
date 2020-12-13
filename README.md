@@ -39,6 +39,19 @@ handle.move(to: 5, 12)
 print(circle.radius!) // 13.0
 ```
 
+### Undo/Redo
+
+Each `Canvas` instance has a built in `UndoManager`. the following properties and methods of `Canvas` are forwarded to and from it:
+
+```swift
+func undo()
+func redo()
+var canUndo: Bool { get }
+var canRedo: Bool { get }
+var groupsUndosByEvent: Bool { get set }
+var levelsOfUndo: Int { get set }
+```
+
 ### Moving Points Smoothly
 
 When a free or constrained point needs to move many times in a short period of time, for example if you are using values from a `Canvas` instance to regularly draw and animate complex constructions, you may benefit from making sure your successive calls to `handle.move(to: x, y)` are preceded and succeeded respectively by calles to `handle.beginSmoothMove()` and `handle.endSmoothMove()`. For example:
@@ -61,3 +74,5 @@ print("circle.radius became \(circle.radius!) in \(endTime - startTime) seconds"
 // circle.radius = 5.0
 // circle.radius became 13.0 in 0.009337067604064941 seconds
 ```
+
+This approach precomputes some parameters that would otherwise be computed on every call to `handle.move(to: x, y)`, such as the set of all dependent figures to be updated on each call.
