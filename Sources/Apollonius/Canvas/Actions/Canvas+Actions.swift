@@ -102,7 +102,7 @@ extension Canvas {
     }
   }
   
-  func add<Figure: FigureProtocol>(_ figure: Figure) {
+  func add<Figure: FigureProtocolInternal>(_ figure: Figure) {
     let key = figure.shape.key
     let item = Item(figure)!
     add(item, for: key)
@@ -111,10 +111,26 @@ extension Canvas {
 
 public extension Canvas {
   func remove(_ handle: PointHandle) {
-    _ = remove(handleFor: handle.point.shape.key)
+    remove(handle.point)
   }
   
-  func remove<F: FigureProtocol>(_ figure: F) {
-    _ = remove(from: figure.shape.key)
+  func remove(_ point: Point) {
+    _ = remove(from: point.shape.key)
+  }
+  
+  func remove(_ circular: Circular) {
+    _ = remove(from: circular.shape.key)
+  }
+  
+  func remove(_ scalar: Scalar) {
+    _ = remove(from: scalar.shape.key)
+  }
+  
+  func remove(_ straight: Straight) {
+    _ = remove(from: straight.shape.key)
+  }
+  
+  func handle(for point: Point) -> PointHandle? {
+    return pointHandles[point.shape.key]
   }
 }

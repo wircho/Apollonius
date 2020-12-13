@@ -49,27 +49,27 @@ extension Canvas {
 }
 
 extension Canvas {
-  func knownPointsKeys<Figure: FigureProtocol>(_ figure: Figure) -> Set<ObjectIdentifier> where Figure.S: GeometricCurveInternal {
+  func knownPointsKeys<Figure: FigureProtocolInternal>(_ figure: Figure) -> Set<ObjectIdentifier> where Figure.S: GeometricCurveInternal {
     return Set(figure.shape.knownPoints.map{ $0.key })
   }
   
-  func knownPoints<Figure: FigureProtocol>(_ figure: Figure) -> [Point] where Figure.S: GeometricCurveInternal {
+  func knownPoints<Figure: FigureProtocolInternal>(_ figure: Figure) -> [Point] where Figure.S: GeometricCurveInternal {
     return knownPointsKeys(figure).map{ items[$0]!.point! }
   }
   
-  func commonKnownPointsKeys<Figure0: FigureProtocol, Figure1: FigureProtocol>(_ figure0: Figure0, _ figure1: Figure1) -> Set<ObjectIdentifier> where Figure0.S: GeometricCurveInternal, Figure1.S: GeometricCurveInternal {
+  func commonKnownPointsKeys<Figure0: FigureProtocolInternal, Figure1: FigureProtocolInternal>(_ figure0: Figure0, _ figure1: Figure1) -> Set<ObjectIdentifier> where Figure0.S: GeometricCurveInternal, Figure1.S: GeometricCurveInternal {
     return knownPointsKeys(figure0).intersection(knownPointsKeys(figure1))
   }
   
-  func commonKnownPoints<Figure0: FigureProtocol, Figure1: FigureProtocol>(_ figure0: Figure0, _ figure1: Figure1) -> [Point] where Figure0.S: GeometricCurveInternal, Figure1.S: GeometricCurveInternal {
+  func commonKnownPoints<Figure0: FigureProtocolInternal, Figure1: FigureProtocolInternal>(_ figure0: Figure0, _ figure1: Figure1) -> [Point] where Figure0.S: GeometricCurveInternal, Figure1.S: GeometricCurveInternal {
     return commonKnownPointsKeys(figure0, figure1).map{ items[$0]!.point! }
   }
   
-  func commonKnownPointsKeys<Figure0: FigureProtocol, Figure1: FigureProtocol, Figure2: FigureProtocol>(_ figure0: Figure0, _ figure1: Figure1, _ figure2: Figure2) -> Set<ObjectIdentifier> where Figure0.S: GeometricCurveInternal, Figure1.S: GeometricCurveInternal, Figure2.S: GeometricCurveInternal {
+  func commonKnownPointsKeys<Figure0: FigureProtocolInternal, Figure1: FigureProtocolInternal, Figure2: FigureProtocolInternal>(_ figure0: Figure0, _ figure1: Figure1, _ figure2: Figure2) -> Set<ObjectIdentifier> where Figure0.S: GeometricCurveInternal, Figure1.S: GeometricCurveInternal, Figure2.S: GeometricCurveInternal {
     return knownPointsKeys(figure0).intersection(knownPointsKeys(figure1)).intersection(knownPointsKeys(figure2))
   }
   
-  func commonKnownPoints<Figure0: FigureProtocol, Figure1: FigureProtocol, Figure2: FigureProtocol>(_ figure0: Figure0, _ figure1: Figure1, _ figure2: Figure2) -> [Point] where Figure0.S: GeometricCurveInternal, Figure1.S: GeometricCurveInternal, Figure2.S: GeometricCurveInternal {
+  func commonKnownPoints<Figure0: FigureProtocolInternal, Figure1: FigureProtocolInternal, Figure2: FigureProtocolInternal>(_ figure0: Figure0, _ figure1: Figure1, _ figure2: Figure2) -> [Point] where Figure0.S: GeometricCurveInternal, Figure1.S: GeometricCurveInternal, Figure2.S: GeometricCurveInternal {
     return commonKnownPointsKeys(figure0, figure1, figure2).map{ items[$0]!.point! }
   }
 }
@@ -112,7 +112,7 @@ extension Canvas {
     gatheredKeys.insert(key)
     // Gathering child keys
     for child in childrenKeys(items[key]!) {
-      guard !gatheredKeys.contains(key) else { continue }
+      guard !gatheredKeys.contains(child) else { continue }
       gatherKeys(from: child, gatheredKeys: &gatheredKeys)
     }
   }

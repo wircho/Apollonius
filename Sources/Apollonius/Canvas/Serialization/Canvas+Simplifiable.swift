@@ -99,7 +99,7 @@ extension Canvas: Simplifiable {
     })
   }
   
-  private static func add<F: FigureProtocol>(alias: String, figure: F, item: Canvas.Item, context: CanvasContext, canvas: Canvas) {
+  private static func add<F: FigureProtocolInternal>(alias: String, figure: F, item: Canvas.Item, context: CanvasContext, canvas: Canvas) {
     context.add(alias: alias, shape: figure.shape)
     canvas.items.unsafelyAppend(key: figure.shape.key, value: item)
   }
@@ -174,25 +174,23 @@ extension Canvas.Item: Simplifiable {
   }
 }
 
-extension Canvas.Figure: Simplifiable where S: GeometricShapeInternal {
-  typealias Context = CanvasContext
-  
-  struct Simplified {
-    let shape: S.Simplified
-    let style: Style
-    let meta: Canvas.FigureMeta
-  }
-  
-  func simplified() -> Simplified {
+struct SimplifiedFigure<F: FigureProtocolInternal> {
+  let shape: F.S.Simplified
+  let style: F.Style
+  let meta: F.Meta
+}
+
+extension FigureProtocolInternal {
+  func simplified() -> SimplifiedFigure<Self> {
     return .init(shape: shape.simplified(), style: style, meta: meta)
   }
   
-  static func from(simplified: Simplified, context: CanvasContext) -> Canvas<T, Specifier>.Figure<S, Style> {
+  static func from(simplified: SimplifiedFigure<Self>, context: CanvasContext) -> Self {
     return .init(.from(simplified: simplified.shape, context: context), style: simplified.style, meta: simplified.meta)
   }
 }
 
-extension Canvas.Figure.Simplified: Codable where S.Simplified: Codable {}
+extension SimplifiedFigure: Codable where F.S.Simplified: Codable {}
 
 extension Geometry.Intersection: Simplifiable {
   typealias Context = CanvasContext

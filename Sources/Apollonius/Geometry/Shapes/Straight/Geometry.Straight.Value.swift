@@ -1,8 +1,8 @@
 
-public extension Geometry.Straight {
+extension Geometry.Straight {
   struct Value {
-    public let origin: XY<T>
-    public let tip: XY<T>
+    let origin: XY<T>
+    let tip: XY<T>
   }
 }
 

@@ -1,6 +1,6 @@
 import Numerics
 
-extension Geometry.Scalar: GeometricShapeInternal {
+extension Geometry.Scalar: GeometricShape {
   func newValue() -> Length<T>? {
     switch parameters {
     case let ._distance(point0, point1):

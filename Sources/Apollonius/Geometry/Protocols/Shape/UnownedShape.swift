@@ -12,7 +12,7 @@ struct UnownedShape<T: Real & Codable> {
   func remove(parent: UnownedShape<T>) { _removeParent(parent) }
   func update() { _update() }
   
-  init<S: GeometricShapeInternal>(_ shape: S) where S.T == T {
+  init<S: GeometricShape>(_ shape: S) where S.T == T {
     self.inner = .init(shape)
     self._children = { [weak shape] in shape!.children }
     self._removeChild = { [weak shape] child in shape!.children.remove(child) }

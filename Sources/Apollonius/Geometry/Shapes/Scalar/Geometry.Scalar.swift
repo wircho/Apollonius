@@ -3,7 +3,7 @@ import Numerics
 public extension Geometry {
   
   final class Scalar<T: Real & Codable> {
-    public internal(set) var value: Length<T>? = nil
+    var value: Length<T>? = nil
     
     let index = Counter.shapes.newIndex()
     let parameters: ScalarParameters<T>

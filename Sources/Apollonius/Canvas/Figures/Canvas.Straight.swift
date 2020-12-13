@@ -1,7 +1,49 @@
 import Numerics
 
 public extension Canvas {
-  typealias Straight = Figure<Geometry.Straight<T>, StraightStyle>
+  final class Straight: FigureProtocolInternal {
+    public enum Kind {
+      case segment, ray, line
+    }
+    
+    public struct Value {
+      public let origin: Coordinates
+      public let tip: Coordinates
+    }
+    
+    typealias Shape = Geometry.Straight<T>
+    public typealias Style = Canvas.StraightStyle
+    public typealias Meta = Canvas.FigureMeta
+    
+    let shape: Shape
+    public var style: Style
+    public var meta: Meta
+    
+    public var value: Value? {
+      guard let geometricValue = shape.value else { return nil }
+      return .init(origin: geometricValue.origin.toCanvas(), tip: geometricValue.tip.toCanvas())
+    }
+    public var origin: Coordinates? { value?.origin }
+    public var tip: Coordinates? { value?.tip }
+    public var slopeAngle: T? {
+      guard let geometricValue = shape.value else { return nil }
+      return geometricValue.angle?.value
+    }
+    
+    public var kind: Kind {
+      switch shape.parameters.kind {
+      case .segment: return .segment
+      case .ray: return .ray
+      case .line: return .line
+      }
+    }
+    
+    init(_ shape: Shape, style: Style, meta: Meta) {
+      self.shape = shape
+      self.style = style
+      self.meta = meta
+    }
+  }
 }
 
 public extension Canvas {

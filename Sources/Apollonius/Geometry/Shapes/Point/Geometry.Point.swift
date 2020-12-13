@@ -3,7 +3,7 @@ import Numerics
 public extension Geometry {
   
   final class Point<T: Real & Codable> {
-    public internal(set) var value: XY<T>? = nil
+    var value: XY<T>? = nil
     
     let index = Counter.shapes.newIndex()
     let parameters: PointParameters<T>

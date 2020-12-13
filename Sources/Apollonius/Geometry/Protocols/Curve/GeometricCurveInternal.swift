@@ -1,4 +1,2 @@
 
-protocol GeometricCurveInternal: GeometricCurve, GeometricShapeInternal {
-  
-}
+protocol GeometricCurveInternal: GeometricCurve {}

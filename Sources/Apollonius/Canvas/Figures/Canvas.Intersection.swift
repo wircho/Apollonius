@@ -1,7 +1,21 @@
 import Numerics
 
 extension Canvas {
-  typealias Intersection = Figure<Geometry.Intersection<T>, IntersectionStyle>
+  final class Intersection: FigureProtocolInternal {
+    typealias Shape = Geometry.Intersection<T>
+    typealias Style = EmptyStyle
+    typealias Meta = Canvas.FigureMeta
+    
+    let shape: Shape
+    var style: Style
+    var meta: Meta
+    
+    init(_ shape: Shape, style: Style, meta: Meta) {
+      self.shape = shape
+      self.style = style
+      self.meta = meta
+    }
+  }
 }
 
 // Internal unsafe static methods (no sorting, checking for existing figures, or adding to items)

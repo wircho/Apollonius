@@ -3,7 +3,7 @@ import Numerics
 public extension Geometry {
   
   final class Straight<T: Real & Codable> {
-    public internal(set) var value: Value? = nil
+    var value: Value? = nil
     
     let index = Counter.shapes.newIndex()
     let parameters: StraightParameters<T>

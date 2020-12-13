@@ -1,7 +1,29 @@
 import Numerics
 
 public extension Canvas {
-  typealias Point = Figure<Geometry.Point<T>, PointStyle>
+  final class Point: FigureProtocolInternal {
+    public typealias Value = Coordinates
+    
+    typealias Shape = Geometry.Point<T>
+    public typealias Style = Canvas.PointStyle
+    public typealias Meta = Canvas.FigureMeta
+    
+    let shape: Shape
+    public var style: Style
+    public var meta: Meta
+    
+    public var value: Value? {
+      return shape.value?.toCanvas()
+    }
+    public var x: T? { value?.x }
+    public var y: T? { value?.y }
+    
+    init(_ shape: Shape, style: Style, meta: Meta) {
+      self.shape = shape
+      self.style = style
+      self.meta = meta
+    }
+  }
 }
 
 public extension Canvas {
@@ -99,11 +121,6 @@ public extension Canvas {
     return point
   }
   
-  private func satisfies(_ condition: ((XY<T>?) -> Bool)?, _ xy: XY<T>?) -> Bool {
-    guard let condition = condition else { return true }
-    return condition(xy)
-  }
-  
   private enum CurvePair {
     case twoCirculars(Circular, Circular)
     case straightCircular(Straight, Circular)
@@ -136,14 +153,23 @@ public extension Canvas {
     }
   }
   
-  private func intersections(_ pair: CurvePair, style: PointStyle, meta: FigureMeta, includeExistingPoints: Bool, condition: ((XY<T>?) -> Bool)?) -> [Point] {
+  typealias IntersectionFilter = (Coordinates?, Coordinates?) -> (Bool, Bool)
+  
+  private func filterTuple(_ xys: Geometry.Intersection<T>.Value?, filter: IntersectionFilter?) -> (Bool, Bool) {
+    guard let filter = filter else { return (true, true) }
+    guard let xys = xys else { return filter(nil, nil) }
+    return filter(xys.first?.toCanvas(), xys.second?.toCanvas())
+  }
+  
+  private func intersections(_ pair: CurvePair, style: PointStyle, meta: FigureMeta, includeExistingPoints: Bool, filter: IntersectionFilter?) -> [Point] {
     let knownPoints = commonKnownPoints(pair)
     switch knownPoints.count {
     case 0:
       // No other known intersection points.
       let intersection = pair.newIntersection()
-      if condition != nil { intersection.shape.update() }
-      let candidateIndices = [.first, .second].filter { satisfies(condition, intersection.shape.value?[$0]) }
+      if filter != nil { intersection.shape.update() }
+      let filtered = self.filterTuple(intersection.shape.value, filter: filter)
+      let candidateIndices: [Geometry.IntersectionIndex] = (filtered.0 ? [.first] : []) + (filtered.1 ? [.second] : [])
       let shapes = candidateIndices.map{ Geometry.Point.intersection(intersection.shape, index: $0) }
       let points = shapes.map{ Point($0, style: style, meta: meta) }
       undoManager.beginUndoGrouping()
@@ -154,21 +180,28 @@ public extension Canvas {
     case 1:
       // 1 known intersection point
       let knownPoint = knownPoints[0]
-      let knownPointSatisfiesCondition = includeExistingPoints && satisfies(condition, knownPoint.shape.value)
       guard case let ._intersection(intersection, otherIndex) = knownPoint.shape.parameters,
         pair.matchesShapes(from: intersection.inner.object) else {
         // The known intersection point was NOT created as an indexed intersection point. Using opposite...
         let intersection = pair.newIntersection()
-        if condition != nil { intersection.shape.update() }
-        let newPointSatisfiesCondition = satisfies(condition, intersection.shape.value?.opposite(to: knownPoint.shape.value))
-        guard newPointSatisfiesCondition else { return knownPointSatisfiesCondition ? [knownPoint] : [] }
+        if filter != nil { intersection.shape.update() }
+        let filtered = filterTuple(
+          .init(
+            first: knownPoint.shape.value,
+            second: intersection.shape.value?.opposite(to: knownPoint.shape.value)
+          ),
+          filter: filter
+        )
+        let knownPointPasses = includeExistingPoints && filtered.0
+        let newPointPasses = filtered.1
+        guard newPointPasses else { return knownPointPasses ? [knownPoint] : [] }
         let shape = Geometry.Point.oppositeIntersection(intersection.shape, from: knownPoint.shape)
         let point = Point(shape, style: style, meta: meta)
         undoManager.beginUndoGrouping()
         add(fragileIntersection: intersection)
         add(point)
         undoManager.endUndoGrouping()
-        return knownPointSatisfiesCondition ? [knownPoint, point] : [point]
+        return knownPointPasses ? [knownPoint, point] : [point]
       }
       // The known intersection was created as an indexed intersection point
       let index: Geometry.IntersectionIndex
@@ -176,28 +209,44 @@ public extension Canvas {
       case .first: index = .second
       case .second: index = .first
       }
-      let newPointSatisfiesCondition = satisfies(condition, intersection.inner.object.value?[index])
-      guard newPointSatisfiesCondition else {
+      let filtered = filterTuple(
+        .init(
+          first: knownPoint.shape.value,
+          second: intersection.inner.object.value?[index]
+        ),
+        filter: filter
+      )
+      let knownPointPasses = includeExistingPoints && filtered.0
+      let newPointPasses = filtered.1
+      guard newPointPasses else {
         // Will not create the new point (does not satisfy condition)
-        return knownPointSatisfiesCondition ? [knownPoint] : []
+        return knownPointPasses ? [knownPoint] : []
       }
       // New point satisfies condition. Creating...
       let shape = Geometry.Point.intersection(intersection.inner.object, index: index)
       let point = Point(shape, style: style, meta: meta)
       add(point)
-      return knownPointSatisfiesCondition ? [knownPoint, point] : [point]
+      return knownPointPasses ? [knownPoint, point] : [point]
     default:
-      // Two or more known intersection points
-      return includeExistingPoints ? knownPoints.filter{ satisfies(condition, $0.shape.value) } : []
+      // Two or more known intersection points - only the first two are returned
+      let filtered = filterTuple(
+        .init(
+          first: knownPoints[0].shape.value,
+          second: knownPoints[2].shape.value
+        ),
+        filter: filter
+      )
+      let filteredPoints: [Point] = (filtered.0 ? [knownPoints[0]] : []) + (filtered.1 ? [knownPoints[1]] : [])
+      return includeExistingPoints ? filteredPoints : []
     }
   }
   
-  func intersections(_ straight: Straight, _ circular: Circular, style: PointStyle = .init(), meta: FigureMeta = .init(), includeExistingPoints: Bool = true, condition: ((XY<T>?) -> Bool)? = nil) -> [Point] {
-    return intersections(.straightCircular(straight, circular), style: style, meta: meta, includeExistingPoints: includeExistingPoints, condition: condition)
+  func intersections(_ straight: Straight, _ circular: Circular, includeExistingPoints: Bool = true, filter: IntersectionFilter? = nil, style: PointStyle = .init(), meta: FigureMeta = .init()) -> [Point] {
+    return intersections(.straightCircular(straight, circular), style: style, meta: meta, includeExistingPoints: includeExistingPoints, filter: filter)
   }
   
-  func intersections(_ unsortedCircular0: Circular, _ unsortedCircular1: Circular, style: PointStyle = .init(), meta: FigureMeta = .init(), includeExistingPoints: Bool = true, condition: ((XY<T>?) -> Bool)? = nil) -> [Point] {
+  func intersections(_ unsortedCircular0: Circular, _ unsortedCircular1: Circular, includeExistingPoints: Bool = true, filter: IntersectionFilter? = nil, style: PointStyle = .init(), meta: FigureMeta = .init()) -> [Point] {
     let (circular0, circular1) = Canvas.sorted(unsortedCircular0, unsortedCircular1)
-    return intersections(.twoCirculars(circular0, circular1), style: style, meta: meta, includeExistingPoints: includeExistingPoints, condition: condition)
+    return intersections(.twoCirculars(circular0, circular1), style: style, meta: meta, includeExistingPoints: includeExistingPoints, filter: filter)
   }
 }

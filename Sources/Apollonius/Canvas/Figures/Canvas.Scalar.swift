@@ -1,7 +1,27 @@
 import Numerics
 
 public extension Canvas {
-  typealias Scalar = Figure<Geometry.Scalar<T>, ScalarStyle>
+  final class Scalar: FigureProtocolInternal {
+    public typealias Value = T
+    
+    typealias Shape = Geometry.Scalar<T>
+    public typealias Style = Canvas.ScalarStyle
+    public typealias Meta = Canvas.FigureMeta
+    
+    let shape: Shape
+    public var style: Style
+    public var meta: Meta
+    
+    public var value: Value? {
+      return shape.value?.value
+    }
+    
+    init(_ shape: Shape, style: Style, meta: Meta) {
+      self.shape = shape
+      self.style = style
+      self.meta = meta
+    }
+  }
 }
 
 public extension Canvas {

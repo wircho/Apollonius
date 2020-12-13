@@ -2,12 +2,7 @@ import Numerics
 
 public extension Geometry {
   final class Circular<T: Real & Codable> {
-    public struct Value {
-      public let center: XY<T>
-      public let radius: Length<T>
-      public let interval: AngleInterval<T>?
-    }
-    public internal(set) var value: Value? = nil
+    var value: Value? = nil
     
     let index = Counter.shapes.newIndex()
     let parameters: CircularParameters<T>

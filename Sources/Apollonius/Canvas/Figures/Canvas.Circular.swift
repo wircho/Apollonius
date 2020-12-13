@@ -1,7 +1,39 @@
 import Numerics
 
 public extension Canvas {
-  typealias Circular = Figure<Geometry.Circular<T>, CircularStyle>
+  final class Circular: FigureProtocolInternal {
+    public struct Value {
+      public let center: Coordinates
+      public let radius: T
+      public let angleInterval: AngleInterval?
+    }
+    
+    typealias Shape = Geometry.Circular<T>
+    public typealias Style = Canvas.CircularStyle
+    public typealias Meta = Canvas.FigureMeta
+    
+    let shape: Shape
+    public var style: Style
+    public var meta: Meta
+    
+    public var value: Value? {
+      guard let geometricValue = shape.value else { return nil }
+      return .init(
+        center: geometricValue.center.toCanvas(),
+        radius: geometricValue.radius.value,
+        angleInterval: geometricValue.interval?.toCanvas()
+      )
+    }
+    public var center: Coordinates? { value?.center }
+    public var radius: T? { value?.radius }
+    public var angleInterval: AngleInterval? { value?.angleInterval }
+    
+    init(_ shape: Shape, style: Style, meta: Meta) {
+      self.shape = shape
+      self.style = style
+      self.meta = meta
+    }
+  }
 }
 
 public extension Canvas {

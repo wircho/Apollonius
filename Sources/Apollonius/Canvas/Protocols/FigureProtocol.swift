@@ -1,9 +1,13 @@
 
 public protocol FigureProtocol {
-  associatedtype S: GeometricShape
   associatedtype Style: FigureStyle
-  associatedtype Meta
-  var shape: S { get }
+  associatedtype Meta: Codable
+  associatedtype Value = Void
   var style: Style { get set }
   var meta: Meta { get set }
+  var value: Value? { get }
+}
+
+public extension FigureProtocol where Value == Void {
+  var value: Void? { return () }
 }
