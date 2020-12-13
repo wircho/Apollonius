@@ -1,10 +1,10 @@
 # Apollonius - A Swift Euclidean Geometry Package
 
-Apollonius is a simple Euclidean geometry library for Swift that allows you to define figures on a 2D plane and computes for you things like circle radii and intersection point coordinates.
+Apollonius is a simple open source Euclidean geometry library in Swift that allows you to define figures in a 2D plane and computes things like circle radii and intersection point coordinates. The figures that can be defined are those that are possible to construct with a ruler and a compass.
 
 ## Usage
 
-With Apollonius you **can** initialize a `Canvas` object, representing a 2D coordinate system, and create figures such as points, lines, and circles that live on this `Canvas` instance. Each new geometric figure may depend on previous figures. For example:
+With Apollonius you can initialize a `Canvas` object, representing a 2D coordinate system, and create figures such as points, lines, and circles that live in this `Canvas` instance. Each new geometric figure may depend on previous figures. For example:
 
 ```swift
 let canvas = Canvas()
@@ -18,16 +18,16 @@ print(line.slopeAngle!) // 0.9272952180016122
 
 ### What Can You **Not** Do With This Package?
 
-With Apollonius alone you **cannot** draw or visually with interact the figures you create. A package that will allow you to do this, ApolloniusUI, is on its way. Feel free to create your own package as well.
+With Apollonius alone you **cannot** draw or visually interact with the figures you create. A package that will allow you to do this, ApolloniusUI, is on its way. Feel free to create your own package as well.
 
 ## Advanced Functionality
 
 ### Moving Points (Point Handles)
 
-You can use `canvas.freePoint(at: x, y)` to create a `Canvas.PointHandle` instance which you can then move using `handle.move(to: x, y)`. Similarly, you can create moving points constrained to circles or lines, using `canvas.pointHandle(on: otherFigure, near: x, y)`
+You can use `canvas.freePoint(at: x, y)` to create a `Canvas.PointHandle` instance which you may then move using `handle.move(to: x, y)`. Similarly, you can create moving points constrained to circles or lines, using `canvas.pointHandle(on: otherFigure, near: x, y)`
 
 
-When a free or constrained point moves, the figures that depend on it move as well. For eample:
+When a free or constrained point moves, the figures that depend on it update as well. For eample:
 
 ```swift
 let canvas = Canvas()
@@ -41,7 +41,7 @@ print(circle.radius!) // 13.0
 
 ### Undo/Redo
 
-Each `Canvas` instance has a built in `UndoManager`. the following properties and methods of `Canvas` are forwarded to and from it:
+Each `Canvas` instance has a built-in [`UndoManager`](https://developer.apple.com/documentation/foundation/undomanager). the following properties and methods of `Canvas` are forwarded to and from it:
 
 ```swift
 func undo()
@@ -54,7 +54,7 @@ var levelsOfUndo: Int { get set }
 
 ### Moving Points Smoothly
 
-When a free or constrained point needs to move many times in a short period of time, for example if you are using values from a `Canvas` instance to regularly draw and animate complex constructions, you may benefit from making sure your successive calls to `handle.move(to: x, y)` are preceded and succeeded respectively by calles to `handle.beginSmoothMove()` and `handle.endSmoothMove()`. For example:
+When a free or constrained point needs to move many times in a short period of time, for example if you are using values from a `Canvas` instance to regularly draw and animate complex constructions, you may benefit from making sure your successive calls to `handle.move(to: x, y)` are preceded and succeeded respectively by calls to `handle.beginSmoothMove()` and `handle.endSmoothMove()`. For example:
 
 ```swift
 // Free point moving SMOOTHLY to (5, 12) in 8000 steps
