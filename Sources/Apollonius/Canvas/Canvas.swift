@@ -9,25 +9,34 @@ public final class Canvas<T: Real & Codable, Specifier: CanvasSpecifierProtocol>
   public typealias ScalarStyle = EmptyStyle
   typealias IntersectionStyle = EmptyStyle
   
-  let undoManager = UndoManager()
+  let undoManager: UndoManager?
   var items: OrderedDictionary<ObjectIdentifier, Item> = [:]
   var pointHandles: Dictionary<ObjectIdentifier, PointHandle> = [:]
   
+  let willChangeHandler: (() -> Void)?
+  
   enum DesignatedParameter { case generic }
   
-  init(_ parameter: DesignatedParameter) {
-    undoManager.levelsOfUndo = 1
+  init(_ parameter: DesignatedParameter, allowsUndo: Bool = false, willChangeHandler: (() -> Void)? = nil) {
+    undoManager = allowsUndo ? .init() : nil
+    self.willChangeHandler = willChangeHandler
   }
 }
 
 public extension Canvas {
-  convenience init(numericalType: T.Type, specifierType: Specifier.Type) { self.init(.generic) }
+  convenience init(numericalType: T.Type, specifierType: Specifier.Type, allowsUndo: Bool = false, willChangeHandler: (() -> Void)? = nil) {
+    self.init(.generic, allowsUndo: allowsUndo, willChangeHandler: willChangeHandler)
+  }
 }
 
 public extension Canvas where Specifier == DefaultCanvasSpecifier {
-  convenience init(numericalType: T.Type) { self.init(.generic) }
+  convenience init(numericalType: T.Type, allowsUndo: Bool = false, willChangeHandler: (() -> Void)? = nil) {
+    self.init(.generic, allowsUndo: allowsUndo, willChangeHandler: willChangeHandler)
+  }
 }
 
 public extension Canvas where T == Double, Specifier == DefaultCanvasSpecifier {
-  convenience init() { self.init(.generic) }
+  convenience init(allowsUndo: Bool = false, willChangeHandler: (() -> Void)? = nil) {
+    self.init(.generic, allowsUndo: allowsUndo, willChangeHandler: willChangeHandler)
+  }
 }

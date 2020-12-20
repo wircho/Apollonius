@@ -1,38 +1,40 @@
+import Foundation
 import Numerics
 
 public extension Canvas {
-  final class Circular: FigureProtocolInternal {
+  final class Circular: FigureProtocol {
+    
+    let storage: FigureProtocolStorage<Geometry.Circular<T>, CircularStyle, FigureMeta>
+    
+    init(storage: FigureProtocolStorage<Geometry.Circular<T>, CircularStyle, FigureMeta>) {
+      self.storage = storage
+    }
+    
+    public var style: CircularStyle {
+      get { storage.style }
+      set { storage.style = newValue }
+    }
+    
+    public var meta: FigureMeta {
+      get { storage.meta }
+      set { storage.meta = newValue }
+    }
+    
     public struct Value {
       public let center: Coordinates
       public let radius: T
       public let angleInterval: AngleInterval?
     }
     
-    typealias Shape = Geometry.Circular<T>
-    public typealias Style = Canvas.CircularStyle
-    public typealias Meta = Canvas.FigureMeta
-    
-    let shape: Shape
-    public var style: Style
-    public var meta: Meta
-    
     public var value: Value? {
       guard let geometricValue = shape.value else { return nil }
-      return .init(
-        center: geometricValue.center.toCanvas(),
-        radius: geometricValue.radius.value,
-        angleInterval: geometricValue.interval?.toCanvas()
-      )
+      return .init(center: geometricValue.center.toCanvas(), radius: geometricValue.radius.value, angleInterval: geometricValue.interval?.toCanvas())
     }
+    
     public var center: Coordinates? { value?.center }
     public var radius: T? { value?.radius }
     public var angleInterval: AngleInterval? { value?.angleInterval }
     
-    init(_ shape: Shape, style: Style, meta: Meta) {
-      self.shape = shape
-      self.style = style
-      self.meta = meta
-    }
   }
 }
 
@@ -46,7 +48,13 @@ public extension Canvas {
     }
     // Creating shape
     let shape = Geometry.Circular.centered(at: center.shape, through: tip.shape)
-    let circular = Circular(shape, style: style, meta: meta)
+    // TODO:
+    // 1. Make undoManager optional. Maybe a boolean whether to support undo or not. Maybe simply not suppporting undo registration is enough? But then this condition cannot block actions? So this is not a proper way to block actions?
+    // 2. Some objects need to be completely quiet. That would mean they block undo actions for as long as they live, and they unblock them when they disappear. How do we police this? What if one of them stays alive forever, will undo actions fail? How do we make all actions fail?
+    // 3. Any use case where not disappearing is useful? Seems very dangerous! What if their ancestors get removed?
+    // 4. An alternative is to have them mirror an existing object weakly, so it has a weak reference but it's not an ancestor, and it can be a quier object because it has not ancestors. And only objects with no non-quiet ancestors can be quiet. I LIKE THIS.
+    // 5. Make objects forward their style and meta changes to the undo manager. So they need a weak reference to the undo manager. THIS MEANS YOU SHOULD NO BE ABLE TO TURN UNDO ON AND OFF ANYTIME. THAT'S OK!
+    let circular = Circular(shape, style: style, meta: meta, canvas: self)
     add(circular)
     return circular
   }
@@ -60,7 +68,7 @@ public extension Canvas {
     }
     // Creating shape
     let shape = Geometry.Circular.centered(at: center.shape, radius: radius.shape)
-    let circular = Circular(shape, style: style, meta: meta)
+    let circular = Circular(shape, style: style, meta: meta, canvas: self)
     add(circular)
     return circular
   }
@@ -73,7 +81,7 @@ public extension Canvas {
     }
     // Creating shape
     let shape = Geometry.Circular.circumscribing(point0.shape, point1.shape, point2.shape)
-    let circular = Circular(shape, style: style, meta: meta)
+    let circular = Circular(shape, style: style, meta: meta, canvas: self)
     add(circular)
     return circular
   }
@@ -87,7 +95,7 @@ public extension Canvas {
     }
     // Creating shape
     let shape = Geometry.Circular.arcCircumscribing(point0.shape, point1.shape, point2.shape)
-    let circular = Circular(shape, style: style, meta: meta)
+    let circular = Circular(shape, style: style, meta: meta, canvas: self)
     add(circular)
     return circular
   }

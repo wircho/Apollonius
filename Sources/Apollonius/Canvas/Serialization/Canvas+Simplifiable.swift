@@ -1,3 +1,4 @@
+import Foundation
 import Numerics
 
 infix operator >>
@@ -48,8 +49,9 @@ extension UnownedScalar {
   var alias: Alias<Geometry.Scalar<T>> { return .init(key.alias) }
 }
 
-final class CanvasContext: SimplifiableContext {
+final class CanvasContext<T: Real & Codable, Specifier: CanvasSpecifierProtocol>: SimplifiableContext {
   var aliasDictionary: [String: AnyUnowned] = [:]
+  weak var canvas: Canvas<T, Specifier>? = nil
   
   init() {}
   
@@ -59,29 +61,51 @@ final class CanvasContext: SimplifiableContext {
   
   func unsafe<S: GeometricShape>(_ alias: Alias<S>) -> S { return aliasDictionary[alias.value]!.object as! S }
   
-  static func >><T: Real & Codable>(context: CanvasContext, alias: Alias<Geometry.Point<T>>) -> UnownedPoint<T>  {
+}
+
+final class AnyCanvasContext<T: Real & Codable>: SimplifiableContext {
+  let originalContext: AnyObject
+  let addMethod: (String, AnyUnowned) -> Void
+  let unsafeMethod: (String) -> AnyUnowned
+  
+  func add<S: GeometricShape>(alias: String, shape: S) { addMethod(alias, .init(shape)) }
+  
+  func unsafe<S: GeometricShape>(_ alias: Alias<S>) -> S { unsafeMethod(alias.value).object as! S }
+  
+  
+  init<Specifier: CanvasSpecifierProtocol>(originalContext: CanvasContext<T, Specifier>) {
+    self.originalContext = originalContext
+    addMethod = { (alias, u) in originalContext.aliasDictionary[alias] = u }
+    unsafeMethod = { alias in originalContext.aliasDictionary[alias]! }
+  }
+  
+  convenience init() {
+    self.init(originalContext: CanvasContext<T, DefaultCanvasSpecifier>())
+  }
+  
+  static func >>(context: AnyCanvasContext, alias: Alias<Geometry.Point<T>>) -> UnownedPoint<T>  {
     return .init(context.unsafe(alias))
   }
   
-  static func >><T: Real & Codable>(context: CanvasContext, alias: Alias<Geometry.Straight<T>>) -> UnownedStraight<T>  {
+  static func >>(context: AnyCanvasContext, alias: Alias<Geometry.Straight<T>>) -> UnownedStraight<T>  {
     return .init(context.unsafe(alias))
   }
   
-  static func >><T: Real & Codable>(context: CanvasContext, alias: Alias<Geometry.Circular<T>>) -> UnownedCircular<T>  {
+  static func >>(context: AnyCanvasContext, alias: Alias<Geometry.Circular<T>>) -> UnownedCircular<T>  {
     return .init(context.unsafe(alias))
   }
   
-  static func >><T: Real & Codable>(context: CanvasContext, alias: Alias<Geometry.Intersection<T>>) -> UnownedIntersection<T>  {
+  static func >>(context: AnyCanvasContext, alias: Alias<Geometry.Intersection<T>>) -> UnownedIntersection<T>  {
     return .init(context.unsafe(alias))
   }
   
-  static func >><T: Real & Codable>(context: CanvasContext, alias: Alias<Geometry.Scalar<T>>) -> UnownedScalar<T>  {
+  static func >>(context: AnyCanvasContext, alias: Alias<Geometry.Scalar<T>>) -> UnownedScalar<T>  {
     return .init(context.unsafe(alias))
   }
 }
 
 extension Canvas: Simplifiable {
-  typealias Context = CanvasContext
+  typealias Context = CanvasContext<T, Specifier>
   
   struct Simplified: Codable {
     struct Element: Codable {
@@ -89,23 +113,25 @@ extension Canvas: Simplifiable {
       let item: Item.Simplified
     }
     
+    let allowsUndo: Bool
     let elements: [Element]
   }
   
   func simplified() -> Simplified {
-    return .init(elements: items.keys.map {
+    return .init(allowsUndo: undoManager != nil, elements: items.keys.map {
       key in
       return .init(alias: key.alias, item: items.unorderedDictionary[key]!.simplified())
     })
   }
   
-  private static func add<F: FigureProtocolInternal>(alias: String, figure: F, item: Canvas.Item, context: CanvasContext, canvas: Canvas) {
+  private static func add<F: FigureProtocol>(alias: String, figure: F, item: Canvas.Item, context: CanvasContext<T, Specifier>, canvas: Canvas) {
     context.add(alias: alias, shape: figure.shape)
     canvas.items.unsafelyAppend(key: figure.shape.key, value: item)
   }
   
-  static func from(simplified: Simplified, context: CanvasContext) -> Canvas {
-    let canvas = Canvas(.generic)
+  static func from(simplified: Simplified, context: CanvasContext<T, Specifier>) -> Canvas {
+    let canvas = Canvas(.generic, allowsUndo: simplified.allowsUndo)
+    context.canvas = canvas
     for element in simplified.elements {
       let item = Canvas.Item.from(simplified: element.item, context: context)
       switch item {
@@ -129,7 +155,7 @@ extension Canvas: Simplifiable {
 }
 
 extension Canvas.Item: Simplifiable {
-  typealias Context = CanvasContext
+  typealias Context = CanvasContext<T, Specifier>
   
   struct Simplified: Codable {
     let point: Canvas.Point.Simplified?
@@ -157,7 +183,7 @@ extension Canvas.Item: Simplifiable {
     }
   }
   
-  static func from(simplified: Simplified, context: CanvasContext) -> Canvas.Item {
+  static func from(simplified: Simplified, context: CanvasContext<T, Specifier>) -> Canvas.Item {
     if let it = simplified.point {
       return .point(.from(simplified: it, context: context))
     } else if let it = simplified.straight {
@@ -174,26 +200,27 @@ extension Canvas.Item: Simplifiable {
   }
 }
 
-struct SimplifiedFigure<F: FigureProtocolInternal> {
+struct SimplifiedFigure<F: FigureProtocol> {
   let shape: F.S.Simplified
   let style: F.Style
   let meta: F.Meta
 }
 
-extension FigureProtocolInternal {
+extension FigureProtocol {
   func simplified() -> SimplifiedFigure<Self> {
     return .init(shape: shape.simplified(), style: style, meta: meta)
   }
   
-  static func from(simplified: SimplifiedFigure<Self>, context: CanvasContext) -> Self {
-    return .init(.from(simplified: simplified.shape, context: context), style: simplified.style, meta: simplified.meta)
+  static func from(simplified: SimplifiedFigure<Self>, context: CanvasContext<S.T, Specifier>) -> Self {
+    let anyCanvasContext = AnyCanvasContext(originalContext: context)
+    return .init(.from(simplified: simplified.shape, context: anyCanvasContext), style: simplified.style, meta: simplified.meta, canvas: context.canvas)
   }
 }
 
 extension SimplifiedFigure: Codable where F.S.Simplified: Codable {}
 
 extension Geometry.Intersection: Simplifiable {
-  typealias Context = CanvasContext
+  typealias Context = AnyCanvasContext<T>
   
   struct Simplified: Codable {
     struct StraightCircular: Codable {
@@ -223,7 +250,7 @@ extension Geometry.Intersection: Simplifiable {
     }
   }
   
-  static func from(simplified: Simplified, context: CanvasContext) -> Geometry.Intersection<T> {
+  static func from(simplified: Simplified, context: AnyCanvasContext<T>) -> Geometry.Intersection<T> {
     if let it = simplified.straightCircular {
       return .init(._straightCircular(context >> it.straight, context >> it.circular))
     } else if let it = simplified.twoCirculars {
@@ -235,7 +262,7 @@ extension Geometry.Intersection: Simplifiable {
 }
 
 extension Geometry.Scalar: Simplifiable {
-  typealias Context = CanvasContext
+  typealias Context = AnyCanvasContext<T>
   
   struct Simplified: Codable {
     struct Distance: Codable {
@@ -256,7 +283,7 @@ extension Geometry.Scalar: Simplifiable {
     }
   }
   
-  static func from(simplified: Simplified, context: CanvasContext) -> Geometry.Scalar<T> {
+  static func from(simplified: Simplified, context: AnyCanvasContext<T>) -> Geometry.Scalar<T> {
     if let it = simplified.distance {
       return .init(._distance(context >> it.point0, context >> it.point1))
     } else {
@@ -266,7 +293,7 @@ extension Geometry.Scalar: Simplifiable {
 }
 
 extension Geometry.Circular: Simplifiable {
-  typealias Context = CanvasContext
+  typealias Context = AnyCanvasContext<T>
   
   struct Simplified: Codable {
     struct Arc: Codable {
@@ -312,7 +339,7 @@ extension Geometry.Circular: Simplifiable {
     }
   }
   
-  static func from(simplified: Simplified, context: CanvasContext) -> Geometry.Circular<T> {
+  static func from(simplified: Simplified, context: AnyCanvasContext<T>) -> Geometry.Circular<T> {
     if let it = simplified.arc {
       return .init(._arc(context >> it.point0, context >> it.point1, context >> it.point2))
     } else if let it = simplified.between {
@@ -328,7 +355,7 @@ extension Geometry.Circular: Simplifiable {
 }
 
 extension Geometry.Straight: Simplifiable {
-  typealias Context = CanvasContext
+  typealias Context = AnyCanvasContext<T>
   
   struct Simplified: Codable {
     struct Between: Codable {
@@ -361,7 +388,7 @@ extension Geometry.Straight: Simplifiable {
     }
   }
   
-  static func from(simplified: Simplified, context: CanvasContext) -> Geometry.Straight<T> {
+  static func from(simplified: Simplified, context: AnyCanvasContext<T>) -> Geometry.Straight<T> {
     if let it = simplified.between {
       return .init(.init(simplified.kind, ._between(origin: context >> it.origin, tip: context >> it.tip)))
     } else if let it = simplified.directed {
@@ -373,7 +400,7 @@ extension Geometry.Straight: Simplifiable {
 }
 
 extension Geometry.Point: Simplifiable {
-  typealias Context = CanvasContext
+  typealias Context = AnyCanvasContext<T>
   
   struct Simplified: Codable {
     struct Circumcenter: Codable {
@@ -454,7 +481,7 @@ extension Geometry.Point: Simplifiable {
     }
   }
   
-  static func from(simplified: Simplified, context: CanvasContext) -> Geometry.Point<T> {
+  static func from(simplified: Simplified, context: AnyCanvasContext<T>) -> Geometry.Point<T> {
     if let it = simplified.circumcenter {
       return .init(._circumcenter(context >> it.point0, context >> it.point1, context >> it.point2))
     } else if let it = simplified.intersection {

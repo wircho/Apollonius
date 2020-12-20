@@ -1,27 +1,29 @@
 public extension Canvas {
+  var allowsUndo: Bool { undoManager != nil }
+  
   func undo() {
-    undoManager.undo()
+    undoManager?.undo()
   }
   
   func redo() {
-    undoManager.redo()
+    undoManager?.redo()
   }
   
   var canUndo: Bool {
-    undoManager.canUndo
+    undoManager?.canUndo ?? false
   }
   
   var canRedo: Bool {
-    undoManager.canRedo
+    undoManager?.canRedo ?? false
   }
   
   var groupsUndosByEvent: Bool {
-    get { undoManager.groupsByEvent }
-    set { undoManager.groupsByEvent = newValue }
+    get { undoManager?.groupsByEvent ?? false }
+    set { undoManager?.groupsByEvent = newValue }
   }
   
   var levelsOfUndo: Int {
-    get { undoManager.levelsOfUndo }
-    set { undoManager.levelsOfUndo = newValue }
+    get { undoManager?.levelsOfUndo ?? 0 }
+    set { undoManager?.levelsOfUndo = newValue }
   }
 }

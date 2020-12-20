@@ -28,33 +28,48 @@ public extension Canvas {
       update()
     }
     
+    var isBlockedByUndoManager: Bool {
+      guard let isUndoRegistrationEnabled = canvas?.undoManager?.isUndoRegistrationEnabled else { return false }
+      return !isUndoRegistrationEnabled
+    }
+    
+    var isAllowedToMove: Bool { isMovingSmoothly || !isBlockedByUndoManager }
+    
+    var isAllowedToRestore: Bool { !isMovingSmoothly && !isBlockedByUndoManager }
+    
+    var isAllowedToRecordState: Bool { !isMovingSmoothly }
+    
+    var isAllowedToBeginSmoothMove: Bool { !isMovingSmoothly && !isBlockedByUndoManager }
+    
+    var isAllowedToEndSmoothMove: Bool { isMovingSmoothly }
+    
     func move(to xy: XY<T>) {
-      guard isMovingSmoothly || canvas?.undoManager.isUndoRegistrationEnabled ?? true else { return }
+      guard isAllowedToMove else { return }
+      canvas?.willChangeHandler?()
       moveCursorAndUpdate(to: xy)
       recordStateAndRegisterUndoIfNeeded()
     }
     
     func restoreAndUpdate(_ state: State) {
-      guard !isMovingSmoothly && canvas?.undoManager.isUndoRegistrationEnabled ?? true else { return }
+      guard isAllowedToRestore else { return }
+      canvas?.willChangeHandler?()
       state.restore()
       update()
       recordStateAndRegisterUndoIfNeeded()
     }
     
     func recordStateAndRegisterUndoIfNeeded() {
-      guard !isMovingSmoothly else { return }
+      guard isAllowedToRecordState, let undoManager = canvas?.undoManager else { return }
       
       let oldState = latestState
       let newState = getCurrentState()
       latestState = newState
       
-      if #available(OSX 10.11, iOS 9.0, *) {
-        canvas?.undoManager.beginUndoGrouping()
-        canvas?.undoManager.registerUndo(withTarget: self) { handle in
-          handle.restoreAndUpdate(oldState)
-        }
-        canvas?.undoManager.endUndoGrouping()
+      undoManager.beginUndoGrouping()
+      undoManager.registerUndo(withTarget: self) { handle in
+        handle.restoreAndUpdate(oldState)
       }
+      undoManager.endUndoGrouping()
     }
     
     init<U>(point: Point, cursor: Geometry.Cursor<U>, canvas: Canvas, conversion: @escaping (XY<T>) -> U) {
@@ -74,16 +89,16 @@ public extension Canvas {
 
 public extension Canvas.PointHandle {
   func beginSmoothMove() {
-    guard !isMovingSmoothly && canvas?.undoManager.isUndoRegistrationEnabled ?? true else { return }
+    guard isAllowedToBeginSmoothMove else { return }
     isMovingSmoothly = true
-    canvas?.undoManager.disableUndoRegistration()
+    canvas?.undoManager?.disableUndoRegistration()
     dependantKeys = canvas?.gatherKeys(from: self.point.shape.key)
   }
   
   func endSmoothMove() {
-    guard isMovingSmoothly else { return }
+    guard isAllowedToEndSmoothMove else { return }
     isMovingSmoothly = false
-    canvas?.undoManager.enableUndoRegistration()
+    canvas?.undoManager?.enableUndoRegistration()
     dependantKeys = nil
     recordStateAndRegisterUndoIfNeeded()
   }

@@ -1,26 +1,16 @@
 import Numerics
 
 public extension Canvas {
-  final class Scalar: FigureProtocolInternal {
+  final class Scalar: UnstyledFigureProtocol {
+    let storage: FigureProtocolStorage<Geometry.Scalar<T>, ScalarStyle, FigureMeta>
+    
+    init(storage: FigureProtocolStorage<Geometry.Scalar<T>, ScalarStyle, FigureMeta>) {
+      self.storage = storage
+    }
+    
     public typealias Value = T
     
-    typealias Shape = Geometry.Scalar<T>
-    public typealias Style = Canvas.ScalarStyle
-    public typealias Meta = Canvas.FigureMeta
-    
-    let shape: Shape
-    public var style: Style
-    public var meta: Meta
-    
-    public var value: Value? {
-      return shape.value?.value
-    }
-    
-    init(_ shape: Shape, style: Style, meta: Meta) {
-      self.shape = shape
-      self.style = style
-      self.meta = meta
-    }
+    public var value: Value? { shape.value?.value }
   }
 }
 
@@ -35,7 +25,7 @@ public extension Canvas {
     }
     // Creating shape
     let shape = Geometry.Scalar.distance(point0.shape, point1.shape)
-    let scalar = Scalar(shape, style: style, meta: meta)
+    let scalar = Scalar(shape, style: .init(), meta: .init(), canvas: self)
     add(scalar)
     return scalar
   }

@@ -6,7 +6,7 @@ final class ApolloniusTests: XCTestCase {
   
   func testCanvas() throws {
     // initialization and undo manager parameters
-    let canvas = Canvas()
+    let canvas = Canvas(allowsUndo: true)
     canvas.levelsOfUndo = 10
     canvas.groupsUndosByEvent = false
     // center at (0, 0)

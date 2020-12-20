@@ -1,6 +1,6 @@
 import Numerics
 
-protocol GeometricShape: AnyObject, Simplifiable where Context == CanvasContext {
+protocol GeometricShape: AnyObject, Simplifiable where Context == AnyCanvasContext<T> {
   associatedtype Parameters
   associatedtype T: Real & Codable
   associatedtype Value

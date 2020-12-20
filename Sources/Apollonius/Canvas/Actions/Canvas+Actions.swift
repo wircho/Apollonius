@@ -1,14 +1,18 @@
 extension Canvas {
+  internal func willDo(silently: Bool = false) -> Bool {
+    guard silently || (undoManager?.isUndoRegistrationEnabled ?? true) else { return false }
+    willChangeHandler?()
+    return true
+  }
+  
   private func registerUndo(_ handler: @escaping (Canvas) -> Void) {
-    if #available(OSX 10.11, iOS 9.0, *) {
-      undoManager.beginUndoGrouping()
-      undoManager.registerUndo(withTarget: self, handler: handler)
-      undoManager.endUndoGrouping()
-    }
+    undoManager?.beginUndoGrouping()
+    undoManager?.registerUndo(withTarget: self, handler: handler)
+    undoManager?.endUndoGrouping()
   }
   
   func add(_ item: Item, for key: ObjectIdentifier) {
-    guard undoManager.isUndoRegistrationEnabled else { return }
+    guard willDo() else { return }
     
     items.unsafelyAppend(key: key, value: item)
     item.update()
@@ -19,7 +23,7 @@ extension Canvas {
   }
   
   func add(_ item: Item, for key: ObjectIdentifier, at index: Int) {
-    guard undoManager.isUndoRegistrationEnabled else { return }
+    guard willDo() else { return }
     
     items.unsafelyInsert(key: key, value: item, at: index)
     item.update()
@@ -30,7 +34,7 @@ extension Canvas {
   }
   
   func add(_ handle: PointHandle, for key: ObjectIdentifier? = nil) {
-    guard undoManager.isUndoRegistrationEnabled else { return }
+    guard willDo() else { return }
     
     let key = key ?? handle.point.shape.key
     pointHandles[key] = handle
@@ -41,7 +45,7 @@ extension Canvas {
   }
   
   func remove(only key: ObjectIdentifier, silently: Bool = false) -> Item? {
-    guard silently || undoManager.isUndoRegistrationEnabled else { return nil }
+    guard willDo(silently: silently) else { return nil }
     
     guard let item = items[key] else { return nil }
     let index = items.unsafelyRemove(key: key)
@@ -56,7 +60,7 @@ extension Canvas {
   }
   
   func remove(handleFor key: ObjectIdentifier) -> PointHandle? {
-    guard undoManager.isUndoRegistrationEnabled else { return nil }
+    guard willDo() else { return nil }
     
     guard let handle = pointHandles[key] else { return nil }
     pointHandles[key] = nil
@@ -69,10 +73,10 @@ extension Canvas {
   }
   
   func remove(from key: ObjectIdentifier) -> [Item] {
-    guard undoManager.isUndoRegistrationEnabled else { return [] }
+    guard willDo() else { return [] }
     
     let keysToDelete = gatherKeys(from: key)
-    undoManager.beginUndoGrouping()
+    undoManager?.beginUndoGrouping()
     var deletedItems: [Item] = []
     for key in keysToDelete {
       guard let item = items[key] else { continue }
@@ -87,7 +91,7 @@ extension Canvas {
         canvas.add(handle, for: key)
       }
     }
-    undoManager.endUndoGrouping()
+    undoManager?.endUndoGrouping()
     return deletedItems
   }
 }
@@ -102,7 +106,7 @@ extension Canvas {
     }
   }
   
-  func add<Figure: FigureProtocolInternal>(_ figure: Figure) {
+  func add<Figure: FigureProtocol>(_ figure: Figure) {
     let key = figure.shape.key
     let item = Item(figure)!
     add(item, for: key)

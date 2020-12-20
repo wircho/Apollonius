@@ -24,7 +24,7 @@ With Apollonius alone you **cannot** draw or visually interact with the figures 
 
 ### Moving Points (Point Handles)
 
-You can use `canvas.freePoint(at: x, y)` to create a `Canvas.PointHandle` instance which you may then move using `handle.move(to: x, y)`. Similarly, you can create moving points constrained to circles or lines, using `canvas.pointHandle(on: otherFigure, near: x, y)`
+You can use `let handle = canvas.pointHandle(at: x, y)` to create a `Canvas.PointHandle` instance and a *free* point `handle.point` which you may then move using `handle.move(to: x, y)`. Similarly, you can create moving points constrained to circles or lines, using `canvas.pointHandle(on: otherFigure, near: x, y)`
 
 
 When a free or constrained point moves, the figures that depend on it update as well. For eample:
@@ -39,9 +39,19 @@ handle.move(to: 5, 12)
 print(circle.radius!) // 13.0
 ```
 
+### `willChangeHandler`
+
+`Canvas` instances can be optionally initialized with a `willChangeHandler` closure parameter:
+
+```swift
+let canvas = Canvas(willChangeHandler: {
+  // Called right before any update due to a `PointHandle.move(to: _, _)` call.
+})
+```
+
 ### Undo/Redo
 
-Each `Canvas` instance has a built-in [`UndoManager`](https://developer.apple.com/documentation/foundation/undomanager). the following properties and methods of `Canvas` are forwarded to and from it:
+Each `Canvas` instance initialized with `allowsUndo: true` has a built-in [`UndoManager`](https://developer.apple.com/documentation/foundation/undomanager). the following properties and methods of `Canvas` are forwarded to and from it:
 
 ```swift
 func undo()

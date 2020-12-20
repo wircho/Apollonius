@@ -1,7 +1,24 @@
+import Foundation
 import Numerics
 
 public extension Canvas {
-  final class Straight: FigureProtocolInternal {
+  final class Straight: FigureProtocol {
+    let storage: FigureProtocolStorage<Geometry.Straight<T>, StraightStyle, FigureMeta>
+    
+    init(storage: FigureProtocolStorage<Geometry.Straight<T>, StraightStyle, FigureMeta>) {
+      self.storage = storage
+    }
+    
+    public var style: StraightStyle {
+      get { storage.style }
+      set { storage.style = newValue }
+    }
+    
+    public var meta: FigureMeta {
+      get { storage.meta }
+      set { storage.meta = newValue }
+    }
+    
     public enum Kind {
       case segment, ray, line
     }
@@ -10,14 +27,6 @@ public extension Canvas {
       public let origin: Coordinates
       public let tip: Coordinates
     }
-    
-    typealias Shape = Geometry.Straight<T>
-    public typealias Style = Canvas.StraightStyle
-    public typealias Meta = Canvas.FigureMeta
-    
-    let shape: Shape
-    public var style: Style
-    public var meta: Meta
     
     public var value: Value? {
       guard let geometricValue = shape.value else { return nil }
@@ -36,12 +45,6 @@ public extension Canvas {
       case .ray: return .ray
       case .line: return .line
       }
-    }
-    
-    init(_ shape: Shape, style: Style, meta: Meta) {
-      self.shape = shape
-      self.style = style
-      self.meta = meta
     }
   }
 }
@@ -68,7 +71,7 @@ public extension Canvas {
     case .ray: (origin, tip) = (unsortedOrigin, unsortedTip)
     }
     let shape = Geometry.Straight<T>.straight(kind, origin.shape, tip.shape)
-    let straight = Straight(shape, style: style, meta: meta)
+    let straight = Straight(shape, style: style, meta: meta, canvas: self)
     add(straight)
     return straight
   }
@@ -95,7 +98,7 @@ public extension Canvas {
     }
     // Creating shape
     let shape = Geometry.Straight<T>.directed(direction, origin: origin.shape, other: other.shape)
-    let straight = Straight(shape, style: style, meta: meta)
+    let straight = Straight(shape, style: style, meta: meta, canvas: self)
     add(straight)
     return straight
   }
