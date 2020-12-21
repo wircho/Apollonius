@@ -3,13 +3,13 @@ import Numerics
 
 public extension Canvas {
   final class Straight: FigureProtocol {
-    let storage: FigureProtocolStorage<Geometry.Straight<T>, StraightStyle, FigureMeta>
+    let storage: FigureProtocolStorage<Geometry.Straight<T>, LineStyle, FigureMeta>
     
-    init(storage: FigureProtocolStorage<Geometry.Straight<T>, StraightStyle, FigureMeta>) {
+    init(storage: FigureProtocolStorage<Geometry.Straight<T>, LineStyle, FigureMeta>) {
       self.storage = storage
     }
     
-    public var style: StraightStyle {
+    public var style: LineStyle {
       get { storage.style }
       set { storage.style = newValue }
     }
@@ -50,7 +50,7 @@ public extension Canvas {
 }
 
 public extension Canvas {
-  private func straight(_ kind: Geometry.StraightKind, _ unsortedOrigin: Point, _ unsortedTip: Point, style: StraightStyle = .init(), meta: FigureMeta = .init()) -> Straight {
+  private func straight(_ kind: Geometry.StraightKind, _ unsortedOrigin: Point, _ unsortedTip: Point, style: LineStyle = .init(), meta: FigureMeta = .init()) -> Straight {
     for child in commonChildren(unsortedOrigin, unsortedTip) {
       guard case let .straight(straight) = child else { continue }
       guard case let ._between(otherOrigin, otherTip) = straight.shape.parameters.definition else { continue }
@@ -76,19 +76,19 @@ public extension Canvas {
     return straight
   }
   
-  func segment(_ origin: Point, _ tip: Point, style: StraightStyle = .init(), meta: FigureMeta = .init()) -> Straight {
+  func segment(_ origin: Point, _ tip: Point, style: LineStyle = .init(), meta: FigureMeta = .init()) -> Straight {
     return straight(.segment, origin, tip, style: style, meta: meta)
   }
   
-  func line(_ origin: Point, _ tip: Point, style: StraightStyle = .init(), meta: FigureMeta = .init()) -> Straight {
+  func line(_ origin: Point, _ tip: Point, style: LineStyle = .init(), meta: FigureMeta = .init()) -> Straight {
     return straight(.line, origin, tip, style: style, meta: meta)
   }
   
-  func ray(_ origin: Point, _ tip: Point, style: StraightStyle = .init(), meta: FigureMeta = .init()) -> Straight {
+  func ray(_ origin: Point, _ tip: Point, style: LineStyle = .init(), meta: FigureMeta = .init()) -> Straight {
     return straight(.ray, origin, tip, style: style, meta: meta)
   }
   
-  private func directedLine(_ direction: Geometry.StraightDirection, from origin: Point, to other: Straight, style: StraightStyle = .init(), meta: FigureMeta = .init()) -> Straight {
+  private func directedLine(_ direction: Geometry.StraightDirection, from origin: Point, to other: Straight, style: LineStyle = .init(), meta: FigureMeta = .init()) -> Straight {
     for child in commonChildren(origin, other) {
       guard case let .straight(straight) = child else { continue }
       guard straight.shape.parameters.kind == .line else { continue }
@@ -103,11 +103,11 @@ public extension Canvas {
     return straight
   }
   
-  func parallelLine(from origin: Point, to straight: Straight, style: StraightStyle = .init(), meta: FigureMeta = .init()) -> Straight {
+  func parallelLine(from origin: Point, to straight: Straight, style: LineStyle = .init(), meta: FigureMeta = .init()) -> Straight {
     return directedLine(.parallel, from: origin, to: straight, style: style, meta: meta)
   }
   
-  func perpendicularLine(from origin: Point, to straight: Straight, style: StraightStyle = .init(), meta: FigureMeta = .init()) -> Straight {
+  func perpendicularLine(from origin: Point, to straight: Straight, style: LineStyle = .init(), meta: FigureMeta = .init()) -> Straight {
     return directedLine(.perpendicular, from: origin, to: straight, style: style, meta: meta)
   }
 }

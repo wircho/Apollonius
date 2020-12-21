@@ -4,8 +4,8 @@ import Numerics
 public final class Canvas<T: Real & Codable, Specifier: CanvasSpecifierProtocol> {
   public typealias FigureMeta = Specifier.FigureMeta
   public typealias PointStyle = Specifier.PointStyle
-  public typealias StraightStyle = Specifier.StraightStyle
-  public typealias CircularStyle = Specifier.CircularStyle
+  public typealias LineStyle = Specifier.LineStyle
+  public typealias CurveStyle = Specifier.CurveStyle
   public typealias ScalarStyle = EmptyStyle
   typealias IntersectionStyle = EmptyStyle
   

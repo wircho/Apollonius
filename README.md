@@ -45,7 +45,8 @@ print(circle.radius!) // 13.0
 
 ```swift
 let canvas = Canvas(willChangeHandler: {
-  // Called right before any update due to a `PointHandle.move(to: _, _)` call.
+  // Called right before any update due to a `PointHandle.move(to: _, _)` call,
+  // Or before any figure addition or removal.
 })
 ```
 
