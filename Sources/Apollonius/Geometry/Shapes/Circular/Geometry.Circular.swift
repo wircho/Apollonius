@@ -1,6 +1,6 @@
 import Numerics
 
-public extension Geometry {
+extension Geometry {
   final class Circular<T: Real & Codable> {
     var value: Value? = nil
     

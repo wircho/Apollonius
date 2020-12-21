@@ -1,6 +1,6 @@
 import Numerics
 
-public extension Geometry {
+extension Geometry {
   
   final class Scalar<T: Real & Codable> {
     var value: Length<T>? = nil

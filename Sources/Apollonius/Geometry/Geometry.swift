@@ -1,1 +1,1 @@
-public enum Geometry {}
+enum Geometry {}

@@ -1,6 +1,6 @@
 import Numerics
 
-public extension Geometry {
+extension Geometry {
   
   final class Point<T: Real & Codable> {
     var value: XY<T>? = nil
