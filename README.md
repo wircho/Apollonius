@@ -13,7 +13,7 @@ let secondPoint = canvas.point(at: 3, 4)
 let circle = canvas.circle(centeredAt: firstPoint, through: secondPoint)
 let line = canvas.line(firstPoint, secondPoint)
 print(circle.radius!) // 5.0
-print(line.slopeAngle!) // 0.9272952180016122
+print(line.directionAngle!) // 0.9272952180016122
 ```
 
 ### What Can You **Not** Do With This Package?

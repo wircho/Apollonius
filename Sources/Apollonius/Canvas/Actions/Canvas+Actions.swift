@@ -122,16 +122,28 @@ public extension Canvas {
     _ = remove(from: point.shape.key)
   }
   
-  func remove(_ circular: Circular) {
-    _ = remove(from: circular.shape.key)
+  func remove(_ circle: Circle) {
+    _ = remove(from: circle.shape.key)
+  }
+  
+  func remove(_ arc: Arc) {
+    _ = remove(from: arc.shape.key)
   }
   
   func remove(_ scalar: Scalar) {
     _ = remove(from: scalar.shape.key)
   }
   
-  func remove(_ straight: Straight) {
-    _ = remove(from: straight.shape.key)
+  func remove(_ line: Line) {
+    _ = remove(from: line.shape.key)
+  }
+  
+  func remove(_ ray: Ray) {
+    _ = remove(from: ray.shape.key)
+  }
+  
+  func remove(_ segment: Segment) {
+    _ = remove(from: segment.shape.key)
   }
   
   func handle(for point: Point) -> PointHandle? {

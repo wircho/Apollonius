@@ -13,6 +13,8 @@ extension OrderedDictionary: ExpressibleByDictionaryLiteral {
     keys = elements.map{ $0.0 }
     unorderedDictionary = .init(elements){ $1 }
   }
+  
+  var values: [Value] { return keys.map{ unorderedDictionary[$0]! } }
 }
 
 extension OrderedDictionary {

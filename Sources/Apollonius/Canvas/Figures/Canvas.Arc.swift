@@ -2,7 +2,7 @@ import Foundation
 import Numerics
 
 public extension Canvas {
-  final class Arc: CircleOrArc, FigureProtocolInternal {
+  final class Arc: CircleOrArcInternal {
     
     let storage: FigureProtocolStorage<Geometry.Circular<T>, CurveStyle, FigureMeta>
     

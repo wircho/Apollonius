@@ -2,113 +2,78 @@ import Foundation
 import Numerics
 
 public extension Canvas {
-  final class Straight: FigureProtocolInternal {
-    let storage: FigureProtocolStorage<Geometry.Straight<T>, LineStyle, FigureMeta>
-    
-    init(storage: FigureProtocolStorage<Geometry.Straight<T>, LineStyle, FigureMeta>) {
-      self.storage = storage
-    }
-    
-    public var style: LineStyle {
-      get { storage.style }
-      set { storage.style = newValue }
-    }
-    
-    public var meta: FigureMeta {
-      get { storage.meta }
-      set { storage.meta = newValue }
-    }
-    
-    public enum Kind {
-      case segment, ray, line
-    }
-    
-    public struct Value {
-      public let origin: Coordinates
-      public let tip: Coordinates
-    }
-    
-    public var value: Value? {
-      guard let geometricValue = shape.value else { return nil }
-      return .init(origin: geometricValue.origin.toCanvas(), tip: geometricValue.tip.toCanvas())
-    }
-    public var origin: Coordinates? { value?.origin }
-    public var tip: Coordinates? { value?.tip }
-    public var slopeAngle: T? {
-      guard let geometricValue = shape.value else { return nil }
-      return geometricValue.angle?.value
-    }
-    
-    public var kind: Kind {
-      switch shape.parameters.kind {
-      case .segment: return .segment
-      case .ray: return .ray
-      case .line: return .line
-      }
-    }
-  }
-}
-
-public extension Canvas {
-  private func straight(_ kind: Geometry.StraightKind, _ unsortedOrigin: Point, _ unsortedTip: Point, style: LineStyle = .init(), meta: FigureMeta = .init()) -> Straight {
+  private func straight<StraightType: LineOrRayOrSegmentInternal>(_ unsortedOrigin: Point, _ unsortedTip: Point, style: LineStyle = .init(), meta: FigureMeta = .init()) -> StraightType where StraightType.T == T, StraightType.Specifier == Specifier, StraightType.Style == LineStyle, StraightType.Meta == FigureMeta {
     for child in commonChildren(unsortedOrigin, unsortedTip) {
-      guard case let .straight(straight) = child else { continue }
-      guard case let ._between(otherOrigin, otherTip) = straight.shape.parameters.definition else { continue }
-      guard straight.shape.parameters.kind == kind else { continue }
+      let optionalChildFigure: StraightType?
+      let childShape: Geometry.Straight<T>
+      switch child {
+      case let .line(figure):
+        optionalChildFigure = figure as? StraightType
+        childShape = figure.shape
+      case let .ray(figure):
+        optionalChildFigure = figure as? StraightType
+        childShape = figure.shape
+      case let .segment(figure):
+        optionalChildFigure = figure as? StraightType
+        childShape = figure.shape
+      case .arc, .circle, .scalar, .intersection, .point: continue
+      }
+      guard let childFigure = optionalChildFigure else { continue }
+      guard case let ._between(otherOrigin, otherTip) = childShape.parameters.definition else { continue }
       let condition: Bool
-      switch kind {
+      switch StraightType.kind {
       case .segment, .line: condition = (otherOrigin == unsortedOrigin.shape && otherTip == unsortedTip.shape) || (otherTip == unsortedOrigin.shape && otherOrigin == unsortedTip.shape)
       case .ray: condition = otherOrigin == unsortedOrigin.shape && otherTip == unsortedTip.shape
       }
       guard condition else { continue }
-      return straight
+      return childFigure
     }
     // Creating shape
     let origin: Point
     let tip: Point
-    switch kind {
+    switch StraightType.kind {
     case .segment, .line: (origin, tip) = Canvas.sorted(unsortedOrigin, unsortedTip)
     case .ray: (origin, tip) = (unsortedOrigin, unsortedTip)
     }
-    let shape = Geometry.Straight<T>.straight(kind, origin.shape, tip.shape)
-    let straight = Straight(shape, style: style, meta: meta, canvas: self)
-    add(straight)
-    return straight
+    let shape = Geometry.Straight<T>.straight(StraightType.kind, origin.shape, tip.shape)
+    let figure = StraightType(shape, style: style, meta: meta, canvas: self)
+    add(figure)
+    return figure
   }
   
-  func segment(_ origin: Point, _ tip: Point, style: LineStyle = .init(), meta: FigureMeta = .init()) -> Straight {
-    return straight(.segment, origin, tip, style: style, meta: meta)
+  func segment(_ origin: Point, _ tip: Point, style: LineStyle = .init(), meta: FigureMeta = .init()) -> Segment {
+    return straight(origin, tip, style: style, meta: meta)
   }
   
-  func line(_ origin: Point, _ tip: Point, style: LineStyle = .init(), meta: FigureMeta = .init()) -> Straight {
-    return straight(.line, origin, tip, style: style, meta: meta)
+  func line(_ origin: Point, _ tip: Point, style: LineStyle = .init(), meta: FigureMeta = .init()) -> Line {
+    return straight(origin, tip, style: style, meta: meta)
   }
   
-  func ray(_ origin: Point, _ tip: Point, style: LineStyle = .init(), meta: FigureMeta = .init()) -> Straight {
-    return straight(.ray, origin, tip, style: style, meta: meta)
+  func ray(_ origin: Point, _ tip: Point, style: LineStyle = .init(), meta: FigureMeta = .init()) -> Ray {
+    return straight(origin, tip, style: style, meta: meta)
   }
   
-  private func directedLine(_ direction: Geometry.StraightDirection, from origin: Point, to other: Straight, style: LineStyle = .init(), meta: FigureMeta = .init()) -> Straight {
-    for child in commonChildren(origin, other) {
-      guard case let .straight(straight) = child else { continue }
-      guard straight.shape.parameters.kind == .line else { continue }
-      guard case let ._directed(childDirection, childOrigin, childOther) = straight.shape.parameters.definition else { continue }
-      guard childDirection == direction && childOrigin == origin.shape && childOther == other.shape else { continue }
-      return straight
+  private func directedLine(_ direction: Geometry.StraightDirection, from origin: Point, to other: Geometry.Straight<T>, style: LineStyle = .init(), meta: FigureMeta = .init()) -> Line {
+    for child in commonChildren(origin.shape, other) {
+      guard case let .line(line) = child else { continue }
+      guard case let ._directed(childDirection, childOrigin, childOther) = line.shape.parameters.definition else { continue }
+      guard childDirection == direction && childOrigin == origin.shape && childOther == other else { continue }
+      return line
     }
     // Creating shape
-    let shape = Geometry.Straight<T>.directed(direction, origin: origin.shape, other: other.shape)
-    let straight = Straight(shape, style: style, meta: meta, canvas: self)
-    add(straight)
-    return straight
+    let shape = Geometry.Straight<T>.directed(direction, origin: origin.shape, other: other)
+    let line = Line(shape, style: style, meta: meta, canvas: self)
+    add(line)
+    return line
   }
   
-  func parallelLine(from origin: Point, to straight: Straight, style: LineStyle = .init(), meta: FigureMeta = .init()) -> Straight {
-    return directedLine(.parallel, from: origin, to: straight, style: style, meta: meta)
+  func parallelLine<Figure: LineOrRayOrSegment>(from origin: Point, to figure: Figure, style: LineStyle = .init(), meta: FigureMeta = .init()) -> Line where Figure.T == T {
+    return directedLine(.parallel, from: origin, to: figure.internalRepresentation.shape, style: style, meta: meta)
   }
   
-  func perpendicularLine(from origin: Point, to straight: Straight, style: LineStyle = .init(), meta: FigureMeta = .init()) -> Straight {
-    return directedLine(.perpendicular, from: origin, to: straight, style: style, meta: meta)
+  func perpendicularLine<Figure: LineOrRayOrSegment>(from origin: Point, to figure: Figure, style: LineStyle = .init(), meta: FigureMeta = .init()) -> Line where Figure.T == T {
+    return directedLine(.perpendicular, from: origin, to: figure.internalRepresentation.shape, style: style, meta: meta)
   }
+  
 }
 

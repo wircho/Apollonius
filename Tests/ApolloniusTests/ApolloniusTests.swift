@@ -34,7 +34,7 @@ final class ApolloniusTests: XCTestCase {
     let circle = canvas.circle(centeredAt: firstPoint, through: secondPoint)
     let line = canvas.line(firstPoint, secondPoint)
     print(circle.radius!) // 5.0
-    print(line.slopeAngle!) // 0.9272952180016122
+    print(line.directionAngle!) // 0.9272952180016122
   }
   
   func testReadme1() throws {

@@ -2,12 +2,14 @@ import Foundation
 import Numerics
 
 public extension Canvas {
-  final class Ray: LineOrRayOrSegment, FigureProtocolInternal {
+  final class Ray: LineOrRayOrSegmentInternal {
     let storage: FigureProtocolStorage<Geometry.Straight<T>, LineStyle, FigureMeta>
     
     init(storage: FigureProtocolStorage<Geometry.Straight<T>, LineStyle, FigureMeta>) {
       self.storage = storage
     }
+    
+    static var kind: Geometry.StraightKind { .ray }
     
     public var internalRepresentation: LineOrRayOrSegmentInternalRepresentation<T> { .init(shape: storage.shape) }
     

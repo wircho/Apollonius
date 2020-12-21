@@ -144,8 +144,11 @@ extension Canvas: Simplifiable {
         case let .free(cursor): canvas.pointHandles[figure.shape.key] = .init(point: figure, cursor: cursor, canvas: canvas) { $0 }
         case ._circumcenter, ._intersection, ._oppositeIntersection, ._twoStraightsIntersection, .fixed: break
         }
-      case let .straight(figure): add(alias: element.alias, figure: figure, item: item, context: context, canvas: canvas)
-      case let .circular(figure): add(alias: element.alias, figure: figure, item: item, context: context, canvas: canvas)
+      case let .line(figure): add(alias: element.alias, figure: figure, item: item, context: context, canvas: canvas)
+      case let .ray(figure): add(alias: element.alias, figure: figure, item: item, context: context, canvas: canvas)
+      case let .segment(figure): add(alias: element.alias, figure: figure, item: item, context: context, canvas: canvas)
+      case let .circle(figure): add(alias: element.alias, figure: figure, item: item, context: context, canvas: canvas)
+      case let .arc(figure): add(alias: element.alias, figure: figure, item: item, context: context, canvas: canvas)
       case let .intersection(figure): add(alias: element.alias, figure: figure, item: item, context: context, canvas: canvas)
       case let .scalar(figure): add(alias: element.alias, figure: figure, item: item, context: context, canvas: canvas)
       }
@@ -159,15 +162,21 @@ extension Canvas.Item: Simplifiable {
   
   struct Simplified: Codable {
     let point: Canvas.Point.Simplified?
-    let straight: Canvas.Straight.Simplified?
-    let circular: Canvas.Circular.Simplified?
+    let line: Canvas.Line.Simplified?
+    let ray: Canvas.Ray.Simplified?
+    let segment: Canvas.Segment.Simplified?
+    let circle: Canvas.Circle.Simplified?
+    let arc: Canvas.Arc.Simplified?
     let intersection: Canvas.Intersection.Simplified?
     let scalar: Canvas.Scalar.Simplified?
     
-    init(point: Canvas.Point.Simplified? = nil, straight: Canvas.Straight.Simplified? = nil, circular: Canvas.Circular.Simplified? = nil, intersection: Canvas.Intersection.Simplified? = nil, scalar: Canvas.Scalar.Simplified? = nil) {
+    init(point: Canvas.Point.Simplified? = nil, line: Canvas.Line.Simplified? = nil, ray: Canvas.Ray.Simplified? = nil, segment: Canvas.Segment.Simplified? = nil, circle: Canvas.Circle.Simplified? = nil, arc: Canvas.Arc.Simplified? = nil, intersection: Canvas.Intersection.Simplified? = nil, scalar: Canvas.Scalar.Simplified? = nil) {
       self.point = point
-      self.straight = straight
-      self.circular = circular
+      self.line = line
+      self.ray = ray
+      self.segment = segment
+      self.circle = circle
+      self.arc = arc
       self.intersection = intersection
       self.scalar = scalar
     }
@@ -176,8 +185,11 @@ extension Canvas.Item: Simplifiable {
   func simplified() -> Simplified {
     switch self {
     case let .point(figure): return .init(point: figure.simplified())
-    case let .straight(figure): return .init(straight: figure.simplified())
-    case let .circular(figure): return .init(circular: figure.simplified())
+    case let .line(figure): return .init(line: figure.simplified())
+    case let .ray(figure): return .init(ray: figure.simplified())
+    case let .segment(figure): return .init(segment: figure.simplified())
+    case let .circle(figure): return .init(circle: figure.simplified())
+    case let .arc(figure): return .init(arc: figure.simplified())
     case let .intersection(figure): return .init(intersection: figure.simplified())
     case let .scalar(figure): return .init(scalar: figure.simplified())
     }
@@ -186,10 +198,16 @@ extension Canvas.Item: Simplifiable {
   static func from(simplified: Simplified, context: CanvasContext<T, Specifier>) -> Canvas.Item {
     if let it = simplified.point {
       return .point(.from(simplified: it, context: context))
-    } else if let it = simplified.straight {
-      return .straight(.from(simplified: it, context: context))
-    } else if let it = simplified.circular {
-      return .circular(.from(simplified: it, context: context))
+    } else if let it = simplified.line {
+      return .line(.from(simplified: it, context: context))
+    } else if let it = simplified.ray {
+      return .ray(.from(simplified: it, context: context))
+    } else if let it = simplified.segment {
+      return .segment(.from(simplified: it, context: context))
+    } else if let it = simplified.circle {
+      return .circle(.from(simplified: it, context: context))
+    } else if let it = simplified.arc {
+      return .arc(.from(simplified: it, context: context))
     } else if let it = simplified.intersection {
       return .intersection(.from(simplified: it, context: context))
     } else if let it = simplified.scalar {

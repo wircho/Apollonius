@@ -2,12 +2,14 @@ import Foundation
 import Numerics
 
 public extension Canvas {
-  final class Segment: LineOrRayOrSegment, FigureProtocolInternal {
+  final class Segment: LineOrRayOrSegmentInternal {
     let storage: FigureProtocolStorage<Geometry.Straight<T>, LineStyle, FigureMeta>
     
     init(storage: FigureProtocolStorage<Geometry.Straight<T>, LineStyle, FigureMeta>) {
       self.storage = storage
     }
+    
+    static var kind: Geometry.StraightKind { .segment }
     
     public var internalRepresentation: LineOrRayOrSegmentInternalRepresentation<T> { .init(shape: storage.shape) }
     
@@ -32,7 +34,7 @@ public extension Canvas {
     }
     public var origin: Coordinates? { value?.origin }
     public var tip: Coordinates? { value?.tip }
-    public var slopeAngle: T? { shape.value?.angle?.value }
+    public var directionAngle: T? { shape.value?.angle?.value }
     public var length: T? { shape.value?.length.value }
   }
 }
