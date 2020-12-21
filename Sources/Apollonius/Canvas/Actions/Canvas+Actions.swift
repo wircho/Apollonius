@@ -106,7 +106,7 @@ extension Canvas {
     }
   }
   
-  func add<Figure: FigureProtocol>(_ figure: Figure) {
+  func add<Figure: FigureProtocolInternal>(_ figure: Figure) {
     let key = figure.shape.key
     let item = Item(figure)!
     add(item, for: key)

@@ -2,7 +2,7 @@ import Foundation
 import Numerics
 
 public extension Canvas {
-  final class Straight: FigureProtocol {
+  final class Straight: FigureProtocolInternal {
     let storage: FigureProtocolStorage<Geometry.Straight<T>, LineStyle, FigureMeta>
     
     init(storage: FigureProtocolStorage<Geometry.Straight<T>, LineStyle, FigureMeta>) {

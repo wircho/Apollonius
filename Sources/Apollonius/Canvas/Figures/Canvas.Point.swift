@@ -2,7 +2,7 @@ import Foundation
 import Numerics
 
 public extension Canvas {
-  final class Point: FigureProtocol {
+  final class Point: FigureProtocolInternal {
     let storage: FigureProtocolStorage<Geometry.Point<T>, PointStyle, FigureMeta>
     
     init(storage: FigureProtocolStorage<Geometry.Point<T>, PointStyle, FigureMeta>) {

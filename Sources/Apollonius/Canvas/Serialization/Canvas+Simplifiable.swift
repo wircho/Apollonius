@@ -124,7 +124,7 @@ extension Canvas: Simplifiable {
     })
   }
   
-  private static func add<F: FigureProtocol>(alias: String, figure: F, item: Canvas.Item, context: CanvasContext<T, Specifier>, canvas: Canvas) {
+  private static func add<F: FigureProtocolInternal>(alias: String, figure: F, item: Canvas.Item, context: CanvasContext<T, Specifier>, canvas: Canvas) {
     context.add(alias: alias, shape: figure.shape)
     canvas.items.unsafelyAppend(key: figure.shape.key, value: item)
   }
@@ -200,13 +200,13 @@ extension Canvas.Item: Simplifiable {
   }
 }
 
-struct SimplifiedFigure<F: FigureProtocol> {
+struct SimplifiedFigure<F: FigureProtocolInternal> {
   let shape: F.S.Simplified
   let style: F.Style
   let meta: F.Meta
 }
 
-extension FigureProtocol {
+extension FigureProtocolInternal {
   func simplified() -> SimplifiedFigure<Self> {
     return .init(shape: shape.simplified(), style: style, meta: meta)
   }

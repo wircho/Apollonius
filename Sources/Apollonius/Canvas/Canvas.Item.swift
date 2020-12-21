@@ -14,7 +14,7 @@ extension Canvas.Item {
     return point
   }
   
-  init?<Figure: FigureProtocol>(_ figure: Figure) {
+  init?<Figure: FigureProtocolInternal>(_ figure: Figure) {
     switch figure {
       case let figure as Canvas.Point: self = .point(figure)
       case let figure as Canvas.Straight: self = .straight(figure)

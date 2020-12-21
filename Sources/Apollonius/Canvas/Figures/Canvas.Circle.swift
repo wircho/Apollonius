@@ -2,13 +2,15 @@ import Foundation
 import Numerics
 
 public extension Canvas {
-  final class Circle: FigureProtocol {
+  final class Circle: CircleOrArc, FigureProtocolInternal {
     
     let storage: FigureProtocolStorage<Geometry.Circular<T>, CurveStyle, FigureMeta>
     
     init(storage: FigureProtocolStorage<Geometry.Circular<T>, CurveStyle, FigureMeta>) {
       self.storage = storage
     }
+    
+    public var internalRepresentation: CircleOrArcInternalRepresentation<T> { .init(shape: storage.shape) }
     
     public var style: CurveStyle {
       get { storage.style }
