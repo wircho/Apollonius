@@ -9,6 +9,8 @@ public extension Canvas {
       self.storage = storage
     }
     
+    public var key: ObjectIdentifier { storage.shape.key }
+    
     public var style: PointStyle {
       get { storage.style }
       set { storage.style = newValue }

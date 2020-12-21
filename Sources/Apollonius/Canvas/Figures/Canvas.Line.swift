@@ -13,6 +13,8 @@ public extension Canvas {
     
     public var internalRepresentation: LineOrRayOrSegmentInternalRepresentation<T> { .init(shape: storage.shape) }
     
+    public var key: ObjectIdentifier { storage.shape.key }
+    
     public var style: LineStyle {
       get { storage.style }
       set { storage.style = newValue }

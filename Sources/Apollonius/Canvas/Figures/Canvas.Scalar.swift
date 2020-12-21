@@ -8,6 +8,8 @@ public extension Canvas {
       self.storage = storage
     }
     
+    public var key: ObjectIdentifier { storage.shape.key }
+    
     public typealias Value = T
     
     public var value: Value? { shape.value?.value }

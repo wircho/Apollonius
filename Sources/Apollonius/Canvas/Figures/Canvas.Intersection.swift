@@ -8,6 +8,8 @@ extension Canvas {
     init(storage: FigureProtocolStorage<Geometry.Intersection<T>, IntersectionStyle, FigureMeta>) {
       self.storage = storage
     }
+    
+    var key: ObjectIdentifier { storage.shape.key }
   }
 }
 

@@ -12,6 +12,8 @@ public extension Canvas {
     
     public var internalRepresentation: CircleOrArcInternalRepresentation<T> { .init(shape: storage.shape) }
     
+    public var key: ObjectIdentifier { storage.shape.key }
+    
     public var style: CurveStyle {
       get { storage.style }
       set { storage.style = newValue }
