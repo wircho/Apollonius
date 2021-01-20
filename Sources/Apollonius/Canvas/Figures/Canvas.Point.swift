@@ -21,7 +21,7 @@ public extension Canvas {
       set { storage.meta = newValue }
     }
     
-    public typealias Value = Coordinates
+    public typealias Value = Coordinates<T>
     
     public var value: Value? { shape.value?.toCanvas() }
     public var x: T? { value?.x }
@@ -168,7 +168,7 @@ public extension Canvas {
     }
   }
   
-  typealias IntersectionFilter = (Coordinates?, Coordinates?) -> (Bool, Bool)
+  typealias IntersectionFilter = (Coordinates<T>?, Coordinates<T>?) -> (Bool, Bool)
   
   private func filterTuple(_ xys: Geometry.Intersection<T>.Value?, filter: IntersectionFilter?) -> (Bool, Bool) {
     guard let filter = filter else { return (true, true) }

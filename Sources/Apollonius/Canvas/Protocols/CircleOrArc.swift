@@ -6,5 +6,7 @@ public struct CircleOrArcInternalRepresentation<T: Real & Codable> {
 
 public protocol CircleOrArc: FigureProtocol {
   var internalRepresentation: CircleOrArcInternalRepresentation<T> { get }
+  var center: Coordinates<T>? { get }
+  var radius: T? { get }
 }
 

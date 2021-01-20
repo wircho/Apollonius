@@ -6,5 +6,7 @@ public struct LineOrRayOrSegmentInternalRepresentation<T: Real & Codable> {
 
 public protocol LineOrRayOrSegment: FigureProtocol {
   var internalRepresentation: LineOrRayOrSegmentInternalRepresentation<T> { get }
+  var origin: Coordinates<T>? { get }
+  var directionAngle: T? { get }
 }
 

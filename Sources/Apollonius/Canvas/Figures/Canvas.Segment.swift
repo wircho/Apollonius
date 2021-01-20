@@ -26,16 +26,16 @@ public extension Canvas {
     }
     
     public struct Value {
-      public let origin: Coordinates
-      public let tip: Coordinates
+      public let origin: Coordinates<T>
+      public let tip: Coordinates<T>
     }
     
     public var value: Value? {
       guard let geometricValue = shape.value else { return nil }
       return .init(origin: geometricValue.origin.toCanvas(), tip: geometricValue.tip.toCanvas())
     }
-    public var origin: Coordinates? { value?.origin }
-    public var tip: Coordinates? { value?.tip }
+    public var origin: Coordinates<T>? { value?.origin }
+    public var tip: Coordinates<T>? { value?.tip }
     public var directionAngle: T? { shape.value?.angle?.value }
     public var length: T? { shape.value?.length.value }
   }

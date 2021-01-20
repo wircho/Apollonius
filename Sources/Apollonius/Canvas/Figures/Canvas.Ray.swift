@@ -26,7 +26,7 @@ public extension Canvas {
     }
     
     public struct Value {
-      public let origin: Coordinates
+      public let origin: Coordinates<T>
       public let directionAngle: T
     }
     
@@ -34,7 +34,7 @@ public extension Canvas {
       guard let geometricValue = shape.value, let directionAngle = geometricValue.angle else { return nil }
       return .init(origin: geometricValue.origin.toCanvas(), directionAngle: directionAngle.value)
     }
-    public var origin: Coordinates? { value?.origin }
+    public var origin: Coordinates<T>? { value?.origin }
     public var directionAngle: T? { value?.directionAngle }
   }
 }

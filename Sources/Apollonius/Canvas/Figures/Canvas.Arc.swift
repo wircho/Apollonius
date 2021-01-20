@@ -25,7 +25,7 @@ public extension Canvas {
     }
     
     public struct Value {
-      public let center: Coordinates
+      public let center: Coordinates<T>
       public let radius: T
       public let angleInterval: AngleInterval?
     }
@@ -35,7 +35,7 @@ public extension Canvas {
       return .init(center: geometricValue.center.toCanvas(), radius: geometricValue.radius.value, angleInterval: geometricValue.interval?.toCanvas())
     }
     
-    public var center: Coordinates? { value?.center }
+    public var center: Coordinates<T>? { value?.center }
     public var radius: T? { value?.radius }
     public var angleInterval: AngleInterval? { value?.angleInterval }
   }

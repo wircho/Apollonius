@@ -25,7 +25,7 @@ public extension Canvas {
     }
     
     public struct Value {
-      public let center: Coordinates
+      public let center: Coordinates<T>
       public let radius: T
     }
     
@@ -33,7 +33,7 @@ public extension Canvas {
       guard let geometricValue = shape.value else { return nil }
       return .init(center: geometricValue.center.toCanvas(), radius: geometricValue.radius.value)
     }
-    public var center: Coordinates? { value?.center }
+    public var center: Coordinates<T>? { value?.center }
     public var radius: T? { value?.radius }
   }
 }
