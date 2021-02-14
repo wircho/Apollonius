@@ -10,6 +10,7 @@ extension Geometry {
     var children: Set<UnownedShape<T>> = []
     var parents: Set<UnownedShape<T>> = []
     var knownPoints: Set<UnownedPoint<T>> = []
+    var endPoints: Set<UnownedPoint<T>> = []
     
     init(_ parameters: StraightParameters<T>) {
       self.parameters = parameters
@@ -17,10 +18,23 @@ extension Geometry {
       switch parameters.definition {
       case let ._between(origin, tip):
         makeChildOf(origin, tip)
-        slideThrough(origin, tip)
+        switch parameters.kind {
+        case .line:
+          slideThrough(origin, tip)
+        case .ray:
+          setEndPoint(origin)
+          slideThrough(tip)
+        case .segment:
+          setEndPoints(origin, tip)
+        }
       case let ._directed(_, origin, other):
         makeChildOf(origin, other)
-        slideThrough(origin)
+        switch parameters.kind {
+        case .line:
+          slideThrough(origin)
+        case .ray, .segment:
+          setEndPoint(origin)
+        }
       }
       update()
     }

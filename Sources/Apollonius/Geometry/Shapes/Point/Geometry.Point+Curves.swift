@@ -17,10 +17,36 @@ extension Geometry.Point {
     layOn(curve0)
     layOn(curve1)
   }
+}
+
+extension Geometry.Point {
+  func setAsEndpointOf<C: GeometricCurveInternal>(_ singleCurve: C) where C.T == T {
+    layOn(singleCurve)
+    endingCurves.insert(.init(singleCurve))
+    singleCurve.endPoints.insert(.init(self))
+  }
   
-  func clearAllCurves() {
-    let unowned = UnownedPoint(self)
-    for curve in knownCurves { curve.remove(knownPoint: unowned) }
+  func setAsEndpointOf<C0: GeometricCurveInternal, C1: GeometricCurveInternal>(_ curve0: C0, _ curve1: C1) where C0.T == T, C1.T == T {
+    setAsEndpointOf(curve0)
+    setAsEndpointOf(curve1)
+  }
+  
+  func setAsEndpointOf<C: UnownedShapeConvertibleInternal>(_ singleCurve: C) where C.ObjectType: GeometricCurveInternal, C.T == T, C.ObjectType.T == T {
+    setAsEndpointOf(singleCurve.inner.object)
+  }
+  
+  func setAsEndpointOf<C0: UnownedShapeConvertibleInternal, C1: UnownedShapeConvertibleInternal>(_ curve0: C0, _ curve1: C1) where C0.ObjectType: GeometricCurveInternal, C1.ObjectType: GeometricCurveInternal, C0.T == T, C1.T == T, C0.ObjectType.T == T, C1.ObjectType.T == T {
+    setAsEndpointOf(curve0)
+    setAsEndpointOf(curve1)
   }
 }
 
+extension Geometry.Point {
+  func clearAllCurves() {
+    let unowned = UnownedPoint(self)
+    for curve in knownCurves {
+      curve.remove(knownPoint: unowned)
+      curve.remove(endPoint: unowned)
+    }
+  }
+}

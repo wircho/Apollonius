@@ -10,6 +10,7 @@ extension Geometry {
     var children: Set<UnownedShape<T>> = []
     var parents: Set<UnownedShape<T>> = []
     var knownCurves: Set<UnownedCurve<T>> = []
+    var endingCurves: Set<UnownedCurve<T>> = []
     
     init(_ parameters: PointParameters<T>) {
       self.parameters = parameters
